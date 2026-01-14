@@ -1,0 +1,319 @@
+/* =====================================================
+   HEADER - Sticky Navigation Bar
+   Glass morphism with centered navigation
+   ===================================================== */
+
+.Header {
+    width: 100%;
+    height: var(--header-height);
+    padding: 0 var(--space-6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    animation: fadeInDown var(--transition-base) ease-out;
+}
+
+/* =====================================================
+   LOGO SECTION
+   ===================================================== */
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
+}
+
+.logo-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md), var(--shadow-glow-primary);
+    position: relative;
+    overflow: hidden;
+}
+
+.logo-icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+}
+
+.logo-w {
+    font-family: var(--font-primary);
+    font-size: var(--text-xl);
+    font-weight: var(--font-extrabold);
+    color: white;
+    position: relative;
+    z-index: 1;
+}
+
+.logo-text {
+    font-family: var(--font-primary);
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+}
+
+/* =====================================================
+   CENTERED NAVIGATION
+   ===================================================== */
+.header-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    background: var(--color-bg-tertiary);
+    padding: var(--space-2);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+    position: relative;
+}
+
+.nav-link svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+    transition: transform var(--transition-base);
+}
+
+.nav-link:hover {
+    color: var(--color-text-primary);
+    background: var(--color-bg-elevated);
+}
+
+.nav-link:hover svg {
+    transform: scale(1.1);
+}
+
+/* Active state */
+.nav-link.active {
+    color: var(--color-primary);
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-full);
+}
+
+/* =====================================================
+   USER SECTION
+   ===================================================== */
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--gradient-secondary);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-base);
+    font-weight: var(--font-bold);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-greeting {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    font-weight: var(--font-medium);
+}
+
+.user-name {
+    font-size: var(--text-sm);
+    color: var(--color-text-primary);
+    font-weight: var(--font-semibold);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.logout-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.logout-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.logout-btn:hover {
+    background: var(--color-error);
+    border-color: var(--color-error);
+    color: white;
+    box-shadow: 0 0 20px rgba(248, 81, 73, 0.3);
+}
+
+/* =====================================================
+   DESKTOP BREAKPOINT (min-width: 1024px)
+   Hide Following/Followers nav links since sidebars show them
+   ===================================================== */
+@media (min-width: 1024px) {
+    /* Hide Following/Followers nav links on desktop - redundant with sidebars */
+    .nav-link[href="/following"],
+    .nav-link[href="/followers"] {
+        display: none;
+    }
+}
+
+/* =====================================================
+   TABLET BREAKPOINT
+   ===================================================== */
+@media (max-width: 1200px) {
+    .Header {
+        padding: 0 var(--space-4);
+    }
+    
+    .nav-link span {
+        display: none;
+    }
+    
+    .nav-link {
+        padding: var(--space-3);
+    }
+    
+    .user-info {
+        display: none;
+    }
+}
+
+/* =====================================================
+   MOBILE BREAKPOINT
+   ===================================================== */
+@media (max-width: 900px) {
+    .Header {
+        padding: 0 var(--space-4);
+        gap: var(--space-3);
+    }
+    
+    .logo-text {
+        display: none;
+    }
+    
+    .header-nav {
+        padding: var(--space-1);
+        gap: var(--space-1);
+        /* Allow horizontal scroll if needed on very small screens */
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+    }
+    
+    .header-nav::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
+    }
+    
+    .nav-link {
+        padding: var(--space-2) var(--space-3);
+        flex-shrink: 0; /* Prevent nav links from shrinking */
+    }
+    
+    .nav-link svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .nav-link span {
+        display: none; /* Hide text labels on mobile, show icons only */
+    }
+    
+    /* AI Translate is visible on mobile - users need access to translations */
+    
+    .nav-link.active::after {
+        display: none;
+    }
+    
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: var(--text-sm);
+    }
+    
+    .logout-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* =====================================================
+   SMALL MOBILE
+   ===================================================== */
+@media (max-width: 480px) {
+    .Header {
+        padding: 0 var(--space-3);
+    }
+    
+    .logo-icon {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .logo-w {
+        font-size: var(--text-lg);
+    }
+    
+    .nav-link {
+        padding: var(--space-2);
+    }
+    
+    .nav-link svg {
+        width: 18px;
+        height: 18px;
+    }
+}

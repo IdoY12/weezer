@@ -1,0 +1,72 @@
+/* =====================================================
+   POST COMMENT - Individual comment card
+   ===================================================== */
+
+.PostComment {
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+    animation: fadeIn var(--transition-base) ease-out both;
+}
+
+/* Stagger animation for comments */
+.PostComments .PostComment:nth-child(3) { animation-delay: 50ms; }
+.PostComments .PostComment:nth-child(4) { animation-delay: 100ms; }
+.PostComments .PostComment:nth-child(5) { animation-delay: 150ms; }
+.PostComments .PostComment:nth-child(6) { animation-delay: 200ms; }
+.PostComments .PostComment:nth-child(7) { animation-delay: 250ms; }
+
+.PostComment:hover {
+    background: var(--color-bg-elevated);
+    border-color: rgba(78, 205, 196, 0.3);
+    transform: translateX(4px);
+}
+
+/* Comment meta - author and date */
+.comment-author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.PostComment h6 {
+    margin: 0;
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.PostComment h6::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--gradient-secondary);
+    border-radius: 50%;
+}
+
+/* Comment body */
+.PostComment div {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 768px) {
+    .PostComment {
+        padding: var(--space-3);
+        border-radius: var(--radius-md);
+    }
+    
+    .PostComment div {
+        font-size: var(--text-xs);
+    }
+}

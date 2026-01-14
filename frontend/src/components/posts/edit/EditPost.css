@@ -1,0 +1,194 @@
+/* =====================================================
+   EDIT POST FORM
+   Dark theme matching NewPost style
+   ===================================================== */
+
+.EditPost {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: var(--space-6);
+    animation: fadeIn var(--transition-slow) ease-out;
+}
+
+.EditPost form {
+    background: var(--gradient-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    box-shadow: var(--shadow-lg), var(--shadow-inset);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative accent */
+.EditPost form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle at top left, var(--color-secondary-glow) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* =====================================================
+   INPUT STYLES
+   ===================================================== */
+.EditPost input[type="text"],
+.EditPost input:not([type]),
+.EditPost textarea {
+    width: 100%;
+    padding: var(--space-4);
+    font-size: var(--text-base);
+    font-family: var(--font-primary);
+    color: var(--color-text-primary);
+    background: var(--color-bg-secondary);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+}
+
+.EditPost input[type="text"]::placeholder,
+.EditPost input:not([type])::placeholder,
+.EditPost textarea::placeholder {
+    color: var(--color-text-muted);
+}
+
+.EditPost input[type="text"]:focus,
+.EditPost input:not([type]):focus,
+.EditPost textarea:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    background: var(--color-bg-tertiary);
+    box-shadow: 0 0 0 4px var(--color-secondary-glow);
+}
+
+/* Title input */
+.EditPost input[type="text"]:first-of-type,
+.EditPost input:not([type]):first-of-type {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+}
+
+/* Textarea */
+.EditPost textarea {
+    min-height: 150px;
+    max-height: 300px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+/* =====================================================
+   IMAGE PREVIEW
+   ===================================================== */
+.EditPost img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--color-border);
+    position: relative;
+    z-index: 1;
+}
+
+/* =====================================================
+   ERROR MESSAGE
+   ===================================================== */
+.EditPost .formError {
+    color: var(--color-error);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    margin-top: calc(var(--space-2) * -1);
+    padding-left: var(--space-2);
+    position: relative;
+    z-index: 1;
+}
+
+/* =====================================================
+   SUBMIT BUTTON
+   ===================================================== */
+.EditPost button,
+.EditPost .SpinnerButton button {
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+    font-size: var(--text-base);
+    font-weight: var(--font-bold);
+    font-family: var(--font-primary);
+    color: white;
+    background: var(--gradient-secondary);
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-md), var(--shadow-glow-secondary);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.EditPost button::before,
+.EditPost .SpinnerButton button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.EditPost button:hover::before,
+.EditPost .SpinnerButton button:hover::before {
+    opacity: 1;
+}
+
+.EditPost button:hover,
+.EditPost .SpinnerButton button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), 0 0 40px var(--color-secondary-glow);
+}
+
+/* Loading state */
+.EditPost .SpinnerButton span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+}
+
+/* =====================================================
+   SPINNER STATE
+   ===================================================== */
+.EditPost > .Spinner {
+    padding: var(--space-16) 0;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 768px) {
+    .EditPost {
+        padding: var(--space-4);
+    }
+    
+    .EditPost form {
+        padding: var(--space-5);
+        gap: var(--space-4);
+    }
+    
+    .EditPost input[type="text"],
+    .EditPost input:not([type]),
+    .EditPost textarea {
+        padding: var(--space-3);
+        font-size: var(--text-sm);
+    }
+}

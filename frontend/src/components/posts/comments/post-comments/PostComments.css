@@ -1,0 +1,38 @@
+/* =====================================================
+   POST COMMENTS - Comments section wrapper
+   ===================================================== */
+
+.PostComments {
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+/* Comments count header */
+.PostComments > div:first-of-type {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.PostComments > div:first-of-type::before {
+    content: '💬';
+    font-size: var(--text-base);
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 768px) {
+    .PostComments {
+        margin-top: var(--space-4);
+        padding-top: var(--space-4);
+        gap: var(--space-3);
+    }
+}

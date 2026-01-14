@@ -1,0 +1,145 @@
+/* =====================================================
+   FEED - Post list with staggered animations
+   ===================================================== */
+
+.Feed {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: var(--space-4) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+/* Stagger animation for feed items */
+.Feed > .Post:nth-child(1) { animation-delay: 0ms; }
+.Feed > .Post:nth-child(2) { animation-delay: 50ms; }
+.Feed > .Post:nth-child(3) { animation-delay: 100ms; }
+.Feed > .Post:nth-child(4) { animation-delay: 150ms; }
+.Feed > .Post:nth-child(5) { animation-delay: 200ms; }
+.Feed > .Post:nth-child(6) { animation-delay: 250ms; }
+.Feed > .Post:nth-child(7) { animation-delay: 300ms; }
+.Feed > .Post:nth-child(8) { animation-delay: 350ms; }
+.Feed > .Post:nth-child(9) { animation-delay: 400ms; }
+.Feed > .Post:nth-child(10) { animation-delay: 450ms; }
+
+/* =====================================================
+   NEW CONTENT NOTIFICATION
+   ===================================================== */
+.info-box {
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.15) 0%, rgba(78, 205, 196, 0.05) 100%);
+    border: 1px solid rgba(78, 205, 196, 0.3);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-xl);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    animation: slideInDown var(--transition-base) ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated gradient border */
+.info-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(78, 205, 196, 0.2), transparent);
+    animation: shimmer 2s infinite;
+    background-size: 200% 100%;
+}
+
+.info-box > span,
+.info-box > div:first-child {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-secondary);
+    position: relative;
+    z-index: 1;
+}
+
+/* Notification icon */
+.info-box::after {
+    content: '✨';
+    position: absolute;
+    left: var(--space-5);
+    font-size: var(--text-lg);
+    animation: float 2s ease-in-out infinite;
+}
+
+/* Adjust text for icon space */
+.info-box {
+    padding-left: calc(var(--space-5) + 32px);
+}
+
+/* Refresh button in info-box */
+.info-box .SpinnerButton button {
+    background: var(--gradient-secondary);
+    color: white;
+    border: none;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.info-box .SpinnerButton button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+}
+
+/* =====================================================
+   EMPTY STATE
+   ===================================================== */
+.Feed > .Spinner {
+    padding: var(--space-16) 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--space-16) var(--space-6);
+    color: var(--color-text-secondary);
+    font-size: var(--text-base);
+    line-height: 1.6;
+}
+
+.empty-state p {
+    margin: 0;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 768px) {
+    .Feed {
+        padding: var(--space-2) 0;
+        gap: var(--space-4);
+    }
+    
+    /* CRITICAL FIX: When Feed is rendered inside mobile tabs, remove only the top padding */
+    .tab-panel-feed .Feed {
+        padding-top: 0 !important;
+    }
+    
+    .info-box {
+        flex-direction: column;
+        text-align: center;
+        padding: var(--space-4);
+        padding-left: var(--space-4);
+    }
+    
+    .info-box::after {
+        position: static;
+        display: block;
+        margin-bottom: var(--space-2);
+    }
+}

@@ -1,0 +1,55 @@
+version: '3.8'
+
+# services - here i am going to list containers that i want to build
+# each service, actually describes a docker run command
+services:
+  
+  database:
+    container_name: weezer-db-compose
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+      - MYSQL_DATABASE=weezer
+      - MYSQL_TCP_PORT=3306
+    ports:
+      - "3309:3306"
+    build: ./database
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+  
+  
+  backend:
+    container_name: weezer-backend-compose
+    environment:
+      - NODE_ENV=compose
+    ports:
+      - "3020:3000"
+    build: ./backend
+    depends_on:
+      database:
+        condition: service_healthy
+
+  io:
+    container_name: weezer-io-compose
+    ports:
+      - "3022:3004"
+    build: ./io
+
+
+  frontend:
+    container_name: weezer-frontend-compose
+    ports: 
+      - 3012:80
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.compose
+
+
+  localstack:
+    container_name: weezer-localstack-compose
+    ports:
+      - 4566:4566
+    image: localstack/localstack

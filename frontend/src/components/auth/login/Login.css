@@ -1,0 +1,367 @@
+/* =====================================================
+   LOGIN PAGE
+   Full-screen dark theme with mesh gradient
+   ===================================================== */
+
+.Login {
+    width: 100%;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: var(--color-bg-primary);
+    padding: var(--space-6);
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: fixed;
+    inset: 0;
+}
+
+/* Mesh gradient background */
+.Login::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+        radial-gradient(ellipse at 20% 20%, rgba(255, 107, 107, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(78, 205, 196, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(255, 230, 109, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Animated floating orbs */
+.Login::after {
+    content: '';
+    position: fixed;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, var(--color-primary-glow) 0%, transparent 70%);
+    border-radius: 50%;
+    top: -100px;
+    right: -100px;
+    animation: float 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* =====================================================
+   LOGIN CONTAINER
+   ===================================================== */
+.login-container {
+    width: 100%;
+    max-width: 440px;
+    background: var(--gradient-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-10);
+    box-shadow: var(--shadow-xl), var(--shadow-inset);
+    position: relative;
+    z-index: 1;
+    animation: scaleIn var(--transition-slow) ease-out;
+    overflow: hidden;
+}
+
+/* Decorative corner glow */
+.login-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle at top left, var(--color-primary-glow) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* =====================================================
+   LOGIN HEADER
+   ===================================================== */
+.login-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+    position: relative;
+    z-index: 1;
+}
+
+.login-header h1 {
+    margin: 0 0 var(--space-3) 0;
+    font-size: var(--text-3xl);
+    font-weight: var(--font-extrabold);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+}
+
+.login-header p {
+    margin: 0;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    font-weight: var(--font-normal);
+}
+
+/* =====================================================
+   GOOGLE SIGN IN BUTTON
+   ===================================================== */
+.google-sign-in {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--color-text-primary);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    transition: all var(--transition-base);
+    margin-bottom: var(--space-6);
+    position: relative;
+    z-index: 1;
+}
+
+.google-sign-in:hover {
+    background: var(--color-bg-elevated);
+    border-color: var(--color-text-muted);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.google-sign-in:active {
+    transform: translateY(0);
+}
+
+.google-sign-in img {
+    width: 24px;
+    height: 24px;
+}
+
+/* =====================================================
+   DIVIDER
+   ===================================================== */
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: var(--space-6) 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    position: relative;
+    z-index: 1;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.divider span {
+    padding: 0 var(--space-4);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* =====================================================
+   FORM
+   ===================================================== */
+.Login form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    position: relative;
+    z-index: 1;
+}
+
+/* =====================================================
+   INPUT GROUP
+   ===================================================== */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.input-group label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-primary);
+}
+
+.Login input {
+    width: 100%;
+    padding: var(--space-4);
+    box-sizing: border-box;
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--color-border);
+    background: var(--color-bg-secondary);
+    font-size: var(--text-base);
+    font-family: var(--font-primary);
+    color: var(--color-text-primary);
+    transition: all var(--transition-base);
+}
+
+.Login input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.Login input:hover {
+    border-color: var(--color-bg-elevated);
+}
+
+.Login input:focus {
+    border-color: var(--color-primary);
+    background: var(--color-bg-tertiary);
+    box-shadow: 0 0 0 4px var(--color-primary-glow);
+    outline: none;
+}
+
+/* =====================================================
+   SUBMIT BUTTON
+   ===================================================== */
+.Login button {
+    width: 100%;
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    border: none;
+    background: var(--gradient-primary);
+    color: white;
+    font-size: var(--text-base);
+    font-weight: var(--font-bold);
+    font-family: var(--font-primary);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    margin-top: var(--space-2);
+    box-shadow: var(--shadow-md), var(--shadow-glow-primary);
+    position: relative;
+    overflow: hidden;
+}
+
+.Login button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.Login button:hover::before {
+    opacity: 1;
+}
+
+.Login button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), 0 0 40px var(--color-primary-glow);
+}
+
+.Login button:active {
+    transform: translateY(0);
+}
+
+/* =====================================================
+   ERROR BOX
+   ===================================================== */
+.error-box {
+    width: 100%;
+    background: rgba(248, 81, 73, 0.1);
+    color: var(--color-error);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(248, 81, 73, 0.3);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    text-align: center;
+    box-sizing: border-box;
+    animation: shake 0.5s ease-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+}
+
+/* =====================================================
+   SPINNER BUTTON LOADING STATE
+   ===================================================== */
+.Login .SpinnerButton span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+}
+
+/* =====================================================
+   LOGIN FOOTER
+   ===================================================== */
+.login-footer {
+    text-align: center;
+    margin-top: var(--space-4);
+}
+
+.login-footer p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+}
+
+.login-footer a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: var(--font-semibold);
+    transition: color var(--transition-base);
+}
+
+.login-footer a:hover {
+    color: var(--color-primary-glow);
+    text-decoration: underline;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 480px) {
+    .Login {
+        padding: var(--space-4);
+    }
+    
+    .login-container {
+        padding: var(--space-6);
+        border-radius: var(--radius-xl);
+    }
+    
+    .login-header h1 {
+        font-size: var(--text-2xl);
+    }
+    
+    .login-header p {
+        font-size: var(--text-sm);
+    }
+    
+    .google-sign-in {
+        padding: var(--space-3);
+        font-size: var(--text-sm);
+    }
+    
+    .Login input {
+        padding: var(--space-3);
+        font-size: var(--text-sm);
+    }
+    
+    .Login button {
+        padding: var(--space-3);
+        font-size: var(--text-sm);
+    }
+}

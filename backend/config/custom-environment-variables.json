@@ -1,0 +1,33 @@
+{
+    "storageProvider": "STORAGE_PROVIDER",
+    "dbType": "DB_TYPE",
+    "app": {
+        "secret": "APP_SECRET",
+        "jwtSecret": "JWT_SECRET"
+    },
+    "db": {
+        "host": "DB_HOST"
+    },
+    "s3": {
+        "connection": {
+            "credentials": {
+                "secretAccessKey": "AWS_SECRET_ACCESS_KEY"
+            }
+        }
+    },
+    "cloudinary": {
+        "cloud_name": "CLOUDINARY_CLOUD_NAME",
+        "api_key": "CLOUDINARY_API_KEY",
+        "api_secret": "CLOUDINARY_API_SECRET"
+    },
+    "google": {
+        "clientSecret": "GOOGLE_CLIENT_SECRET"
+    },
+    "stripe": {
+        "secret": "STRIPE_SECRET",
+        "whsec": "WH_SEC"
+    },
+    "openai": {
+        "secret": "OPENAI_SECRET"
+    }
+}

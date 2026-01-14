@@ -1,0 +1,43 @@
+/* =====================================================
+   NOT FOUND - 404 Error Page
+   ===================================================== */
+
+.NotFound {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: var(--space-8);
+    text-align: center;
+    animation: fadeIn var(--transition-slow) ease-out;
+}
+
+/* 404 Number */
+.NotFound::before {
+    content: '404';
+    font-size: clamp(80px, 20vw, 180px);
+    font-weight: var(--font-extrabold);
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: var(--space-4);
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Error message */
+.NotFound {
+    font-size: var(--text-xl);
+    color: var(--color-text-secondary);
+    font-weight: var(--font-medium);
+}
+
+/* Decorative elements */
+.NotFound::after {
+    content: '🔍';
+    font-size: var(--text-4xl);
+    margin-top: var(--space-6);
+    animation: bounceIn 0.6s ease-out 0.3s both;
+}

@@ -1,0 +1,41 @@
+/* =====================================================
+   CHECKOUT FORM - Stripe Payment Elements
+   Inherits from Translation.css parent styles
+   ===================================================== */
+
+/* The form styles are primarily handled by Translation.css
+   This file provides additional specificity for Stripe elements */
+
+/* Payment Element wrapper */
+.CheckoutForm {
+    width: 100%;
+}
+
+/* Stripe PaymentElement styling overrides */
+.CheckoutForm .StripeElement,
+.CheckoutForm [class*="p-"] {
+    background: var(--color-bg-secondary) !important;
+    border-radius: var(--radius-lg) !important;
+}
+
+/* Price display */
+.CheckoutForm .price-display {
+    text-align: center;
+    padding: var(--space-4);
+    background: rgba(78, 205, 196, 0.1);
+    border: 1px solid rgba(78, 205, 196, 0.3);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-4);
+}
+
+.CheckoutForm .price-display .amount {
+    font-size: var(--text-3xl);
+    font-weight: var(--font-extrabold);
+    color: var(--color-secondary);
+}
+
+.CheckoutForm .price-display .label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-top: var(--space-1);
+}

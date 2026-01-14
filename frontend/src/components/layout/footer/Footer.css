@@ -1,0 +1,73 @@
+/* =====================================================
+   FOOTER - App footer with copyright
+   ===================================================== */
+
+.Footer {
+    width: 100%;
+    padding: var(--space-5) var(--space-6);
+    background: var(--color-bg-secondary);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.footer-brand {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-secondary);
+}
+
+.footer-divider {
+    color: var(--color-border);
+    font-size: var(--text-xs);
+}
+
+.footer-user {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.footer-user strong {
+    color: var(--color-primary);
+    font-weight: var(--font-semibold);
+}
+
+.footer-server {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 768px) {
+    .Footer {
+        padding: var(--space-4);
+        gap: var(--space-3);
+    }
+    
+    .footer-brand,
+    .footer-user {
+        font-size: var(--text-xs);
+    }
+    
+    .footer-server {
+        font-size: 10px;
+    }
+    
+    .footer-divider {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .Footer {
+        flex-direction: column;
+        gap: var(--space-2);
+        text-align: center;
+    }
+}

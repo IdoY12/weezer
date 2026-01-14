@@ -1,0 +1,51 @@
+{
+    "app": {
+        "port": 3000,
+        "name": "weezer dev",
+        "secret": "MySecret",
+        "jwtSecret": "JwtSecret"
+    },
+    "storageProvider": "s3",
+    "dbType": "mysql",
+    "db": {
+        "host": "localhost",
+        "port": 3308,
+        "username": "root",
+        "password": "",
+        "database": "weezer"
+    },
+    "s3": {
+        "bucket": "images.weezer.com",
+        "isLocalStack": true,
+        "connection": {
+            "endpoint": "http://localhost:4566",
+            "region": "us-east-1",
+            "credentials": {
+                "accessKeyId": "test",
+                "secretAccessKey": "test"
+            },
+            "forcePathStyle": true
+        }
+    },
+    "cloudinary": {
+        "cloud_name": "",
+        "api_key": "",
+        "api_secret": ""
+    },
+    "io": {
+        "host": "localhost",
+        "port": 3004
+    },
+    "google": {
+        "clientId": "671309257050-tiaf5qq0thrm45riv70ub718bdv86nqf.apps.googleusercontent.com",
+        "clientSecret": ""
+    },
+    "stripe": {
+        "publishableKey": "pk_test_51SgqgYISFdCWx0atQ84SNI5P2uiTrB3c8NvAgtuvhUKd2OlxWPNwaFhnWfYUHnhGIVkyz8paW9utyLxO7PEIlCw400huOeQ85C",
+        "clientSecret": "",
+        "whsec": ""
+    },
+    "openai": {
+        "secret": ""
+    }
+}

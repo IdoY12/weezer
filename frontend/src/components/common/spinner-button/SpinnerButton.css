@@ -1,0 +1,102 @@
+/* =====================================================
+   SPINNER BUTTON - Button with loading state
+   ===================================================== */
+
+.SpinnerButton {
+    display: inline-flex;
+    width: 100%;
+}
+
+/* Loading state text */
+.SpinnerButton span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-text-muted);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+/* Hide the GIF and use CSS spinner instead */
+.SpinnerButton i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.SpinnerButton i img {
+    display: none;
+}
+
+/* Custom inline spinner */
+.SpinnerButton i::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--color-bg-elevated);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Button styles (inherits from parent context but provides fallback) */
+.SpinnerButton button {
+    width: 100%;
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    font-family: var(--font-primary);
+    color: white;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.SpinnerButton button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(255,255,255,0.15), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.SpinnerButton button:hover::before {
+    opacity: 1;
+}
+
+.SpinnerButton button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md), var(--shadow-glow-primary);
+}
+
+.SpinnerButton button:active {
+    transform: translateY(0);
+}
+
+/* Compact variant */
+.SpinnerButton.compact button {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+}
+
+.SpinnerButton.compact span {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+}
+
+.SpinnerButton.compact i::before {
+    width: 12px;
+    height: 12px;
+}

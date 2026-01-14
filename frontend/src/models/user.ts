@@ -1,0 +1,7 @@
+export default interface User {
+    id: string,
+    name: string,
+    username: string,
+    isPay: boolean,
+    profilePicture?: string | null
+}

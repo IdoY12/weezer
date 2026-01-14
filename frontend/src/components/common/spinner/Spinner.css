@@ -1,0 +1,77 @@
+/* =====================================================
+   SPINNER - Loading State
+   Modern animated spinner
+   ===================================================== */
+
+.Spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-8);
+    animation: fadeIn var(--transition-base) ease-out;
+}
+
+/* Hide the default GIF and use custom spinner */
+.Spinner img {
+    display: none;
+}
+
+/* Custom CSS Spinner */
+.Spinner::before {
+    content: '';
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--color-bg-elevated);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Pulsing glow effect */
+.Spinner::after {
+    content: '';
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-primary-glow);
+    filter: blur(20px);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Alternative: Show GIF if preferred */
+.Spinner.use-gif img {
+    display: block;
+    height: 80px;
+    width: auto;
+    opacity: 0.8;
+}
+
+.Spinner.use-gif::before,
+.Spinner.use-gif::after {
+    display: none;
+}
+
+/* Small variant */
+.Spinner.small::before {
+    width: 24px;
+    height: 24px;
+    border-width: 2px;
+}
+
+.Spinner.small::after {
+    width: 24px;
+    height: 24px;
+}
+
+/* Large variant */
+.Spinner.large::before {
+    width: 64px;
+    height: 64px;
+    border-width: 4px;
+}
+
+.Spinner.large::after {
+    width: 64px;
+    height: 64px;
+}
