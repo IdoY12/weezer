@@ -31,6 +31,20 @@ docker compose up localstack
 
 ---
 
+## 👥 Seeded Users
+
+The project includes pre-seeded user accounts for testing purposes. You can use any of these credentials to log in:
+
+| Username | Password |
+|----------|----------|
+| `bob000` | `123456` |
+| `alice0` | `123456` |
+| `charlie` | `123456` |
+| `gustav` | `123456` |
+| `diana` | `123456` |
+
+---
+
 ## 🐳 Docker & Configuration
 
 - All environment variables and ports are defined in `docker-compose.yml`
@@ -71,5 +85,3 @@ weezer/
 - 🎨 Modern React UI
 - 📦 Fully containerized with Docker
 - ☁️ AWS-ready with LocalStack for local development
-
----
