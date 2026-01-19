@@ -1,6 +1,7 @@
 {
     "db": {
-        "host": "database"
+        "host": "database",
+        "port": 3000
     },
     "s3": {
         "connection": {
