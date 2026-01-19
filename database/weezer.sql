@@ -261,20 +261,36 @@ CREATE TABLE `users` (
   `name` varchar(30) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `google_id` varchar(255) DEFAULT NULL,
+  `full_name` varchar(255) DEFAULT NULL,
+  `is_pay` tinyint(1) NOT NULL DEFAULT '0',
+  `profile_picture` varchar(255) DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `username`, `password`, `created_at`, `updated_at`) VALUES
-('034485be-cfd2-48a7-b80d-f54773eab18c', 'Diana', 'diana0', '7f7737fddd2842bc2afdbf1868aaa8e986b83133a1f010fe96535c15e4584628', '2025-10-26 06:44:53', '2025-10-26 06:44:53'),
-('1230ae30-dc4f-4752-bd84-092956f5c633', 'Bob', 'bob000', '7f7737fddd2842bc2afdbf1868aaa8e986b83133a1f010fe96535c15e4584628', '2025-10-26 06:44:53', '2025-10-26 06:44:53'),
-('4b1193cc-7ba1-462c-99c5-2e3ea4ab6d14', 'Alice', 'alice0', '7f7737fddd2842bc2afdbf1868aaa8e986b83133a1f010fe96535c15e4584628', '2025-10-26 06:44:53', '2025-10-26 06:44:53'),
-('57ca1e6a-fc89-4d28-ad45-a1f351862cfc', 'Charlie', 'charlie', '7f7737fddd2842bc2afdbf1868aaa8e986b83133a1f010fe96535c15e4584628', '2025-10-26 06:44:53', '2025-10-26 06:44:53'),
-('bff2018c-b130-4de4-b645-3246b6e4dbb6', 'Gustav', 'gustav', '7f7737fddd2842bc2afdbf1868aaa8e986b83133a1f010fe96535c15e4584628', '2025-10-26 06:44:53', '2025-10-26 06:44:53');
+INSERT INTO `users` (`id`, `name`, `username`, `password`, `email`, `google_id`, `full_name`, `is_pay`, `profile_picture`, `created_at`, `updated_at`) VALUES
+('034485be-cfd2-48a7-b80d-f54773eab18c', 'Diana', 'diana0', '7f7737fddd2842bc2afdbf1868aaa8e986b83133a1f010fe96535c15e4584628', NULL, NULL, NULL, 0, NULL, '2025-10-26 06:44:53', '2025-10-26 06:44:53'),
+('1230ae30-dc4f-4752-bd84-092956f5c633', 'Bob', 'bob000', '7f7737fddd2842bc2afdbf1868aaa8e986b83133a1f010fe96535c15e4584628', NULL, NULL, NULL, 0, NULL, '2025-10-26 06:44:53', '2025-10-26 06:44:53'),
+('4b1193cc-7ba1-462c-99c5-2e3ea4ab6d14', 'Alice', 'alice0', '7f7737fddd2842bc2afdbf1868aaa8e986b83133a1f010fe96535c15e4584628', NULL, NULL, NULL, 0, NULL, '2025-10-26 06:44:53', '2025-10-26 06:44:53'),
+('57ca1e6a-fc89-4d28-ad45-a1f351862cfc', 'Charlie', 'charlie', '7f7737fddd2842bc2afdbf1868aaa8e986b83133a1f010fe96535c15e4584628', NULL, NULL, NULL, 0, NULL, '2025-10-26 06:44:53', '2025-10-26 06:44:53'),
+('bff2018c-b130-4de4-b645-3246b6e4dbb6', 'Gustav', 'gustav', '7f7737fddd2842bc2afdbf1868aaa8e986b83133a1f010fe96535c15e4584628', NULL, NULL, NULL, 0, NULL, '2025-10-26 06:44:53', '2025-10-26 06:44:53');
+
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `users_username` (`username`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `google_id` (`google_id`);
 
 --
 -- Indexes for dumped tables
@@ -302,13 +318,6 @@ ALTER TABLE `follows`
 ALTER TABLE `posts`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `users_username` (`username`);
 
 --
 -- Constraints for dumped tables
