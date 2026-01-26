@@ -3,6 +3,9 @@
 A modern full-stack social platform built with a production-first mindset.  
 Dockerized architecture with real-time communication, authentication, cloud-ready services, and clean service separation.
 
+<img width="3272" height="1798" alt="image" src="https://github.com/user-attachments/assets/f1653f1b-4a89-48f5-b351-16be8802220c" />
+
+
 ---
 
 ## ⚡ Quick Start
