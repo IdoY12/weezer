@@ -16,20 +16,24 @@ export const followersSlice = createSlice({
     initialState,
     reducers: {
         init: (state, action: PayloadAction<User[]>) => {
-            state.followers = action.payload;
+            const dedupedById = new Map<string, User>();
+            action.payload.forEach(user => {
+                dedupedById.set(String(user.id).toLowerCase(), user);
+            });
+            state.followers = [...dedupedById.values()];
         },
         newFollower: (state, action: PayloadAction<User>) => {
-            // Prevent duplicates - check if follower already exists
-            const existingIndex = state.followers.findIndex(f => f.id === action.payload.id);
+            const targetId = String(action.payload.id).toLowerCase();
+            const existingIndex = state.followers.findIndex(f => String(f.id).toLowerCase() === targetId);
             if (existingIndex === -1) {
                 state.followers.push(action.payload);
             } else {
-                // Update existing follower (in case profile changed)
                 state.followers[existingIndex] = action.payload;
             }
         },
         followerRemoved: (state, action: PayloadAction<string>) => {
-            state.followers = state.followers.filter(follow => follow.id !== action.payload);
+            const targetId = String(action.payload).toLowerCase();
+            state.followers = state.followers.filter(follow => String(follow.id).toLowerCase() !== targetId);
         },
         updateUserProfilePicture: (state, action: PayloadAction<{ userId: string, profilePicture: string | null }>) => {
             const follower = state.followers.find(f => f.id === action.payload.userId);

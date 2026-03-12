@@ -4,11 +4,13 @@ import type PostComment from "../models/post-comment";
 
 interface FeedState {
     posts: Post[],
+    pendingPosts: Post[],
     isNewContentAvailable: boolean
 }
 
 const initialState: FeedState = {
     posts: [],
+    pendingPosts: [],
     isNewContentAvailable: false
 };
 
@@ -18,24 +20,33 @@ export const feedSlice = createSlice({
     reducers: {
         init: (state, action: PayloadAction<Post[]>) => {
             state.posts = action.payload;
+            state.pendingPosts = [];
             state.isNewContentAvailable = false;
         },
         newComment: (state, action: PayloadAction<PostComment>) => {
             const post = state.posts.find(p => p.id === action.payload.postId);
             post?.comments.push(action.payload);
         },
-        indicateNewContentAvailable: (state) => {
-            state.isNewContentAvailable = true;
-        },
-        newPost: (state, action: PayloadAction<Post>) => {
-            // Add new post to feed if it's from a followed user
-            // Check if post already exists (avoid duplicates)
-            const postExists = state.posts.find(p => p.id === action.payload.id);
-            if (!postExists) {
-                // Add to beginning of feed (newest first)
-                state.posts = [action.payload, ...state.posts];
-                state.isNewContentAvailable = false;
+        indicateNewContentAvailable: (state, action: PayloadAction<Post>) => {
+            const post = action.payload;
+            const postId = String(post.id).toLowerCase();
+            const visibleExists = state.posts.some(existing => String(existing.id).toLowerCase() === postId);
+            const pendingExists = state.pendingPosts.some(existing => String(existing.id).toLowerCase() === postId);
+            if (!visibleExists && !pendingExists) {
+                state.pendingPosts = [post, ...state.pendingPosts];
+                state.isNewContentAvailable = true;
             }
+        },
+        applyPendingPosts: (state) => {
+            const existingIds = new Set(state.posts.map(post => String(post.id).toLowerCase()));
+            const freshPending = state.pendingPosts.filter(post => !existingIds.has(String(post.id).toLowerCase()));
+            state.posts = [...freshPending, ...state.posts];
+            state.pendingPosts = [];
+            state.isNewContentAvailable = false;
+        },
+        dismissPendingPosts: (state) => {
+            state.pendingPosts = [];
+            state.isNewContentAvailable = false;
         },
         updateUserProfilePicture: (state, action: PayloadAction<{ userId: string, profilePicture: string | null }>) => {
             // Update post authors
@@ -56,6 +67,6 @@ export const feedSlice = createSlice({
     }
 });
 
-export const { init, newComment, indicateNewContentAvailable, updateUserProfilePicture, newPost } = feedSlice.actions;
+export const { init, newComment, indicateNewContentAvailable, applyPendingPosts, dismissPendingPosts, updateUserProfilePicture } = feedSlice.actions;
 
 export default feedSlice.reducer;

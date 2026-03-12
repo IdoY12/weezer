@@ -5,7 +5,7 @@
 
 .Layout {
     display: grid;
-    grid-template-columns: 280px 1fr 280px;
+    grid-template-columns: 1fr;
     grid-template-rows: var(--header-height) 1fr auto;
     gap: 0;
     row-gap: 0;
@@ -55,60 +55,14 @@
     padding: 0;
 }
 
-/* =====================================================
-   DESKTOP LAYOUT (3-COLUMN GRID)
-   ===================================================== */
-
-/* Left Sidebar - Following */
-.sidebar-left {
-    grid-column: 1;
-    grid-row: 2;
-    position: sticky;
-    top: calc(var(--header-height) + var(--space-6));
-    height: fit-content;
-    max-height: calc(100vh - var(--header-height) - var(--space-12));
-    overflow: visible;
-    padding: var(--space-6);
-    z-index: var(--z-base);
-    animation: slideInLeft var(--transition-slow) ease-out;
-}
-
-/* Right Sidebar - Followers */
-.sidebar-right {
-    grid-column: 3;
-    grid-row: 2;
-    position: sticky;
-    top: calc(var(--header-height) + var(--space-6));
-    height: fit-content;
-    max-height: calc(100vh - var(--header-height) - var(--space-12));
-    overflow: visible;
-    padding: var(--space-6);
-    z-index: var(--z-base);
-    animation: slideInRight var(--transition-slow) ease-out;
-}
-
-/* Sidebar sections */
-.sidebar-section {
-    background: var(--gradient-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    padding: var(--space-5);
-    box-shadow: var(--shadow-md), var(--shadow-inset);
-    max-height: calc(100vh - var(--header-height) - var(--space-20));
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
 /* Main content area */
 .main-content {
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 2;
     padding: var(--space-6);
     overflow-y: auto;
     overflow-x: hidden;
     z-index: var(--z-base);
-    animation: fadeIn var(--transition-slow) ease-out;
     min-height: calc(100vh - var(--header-height) - 80px);
 }
 
@@ -124,21 +78,8 @@
    TABLET BREAKPOINT (768px - 1023px)
    ===================================================== */
 @media (max-width: 1023px) and (min-width: 768px) {
-    .Layout {
-        grid-template-columns: 240px 1fr 240px;
-    }
-    
-    .sidebar-left,
-    .sidebar-right {
-        padding: var(--space-4);
-    }
-    
     .main-content {
         padding: var(--space-5);
-    }
-    
-    .sidebar-section {
-        padding: var(--space-4);
     }
 }
 
@@ -155,12 +96,6 @@
     .Layout > header {
         grid-column: 1;
         grid-row: 1;
-    }
-    
-    /* Hide sidebars on mobile */
-    .sidebar-left,
-    .sidebar-right {
-        display: none;
     }
     
     .main-content {
@@ -181,27 +116,3 @@
     }
 }
 
-/* =====================================================
-   SCROLLBAR STYLING FOR SIDEBARS
-   ===================================================== */
-.sidebar-left::-webkit-scrollbar,
-.sidebar-right::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-.sidebar-left::-webkit-scrollbar-track,
-.sidebar-right::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.sidebar-left::-webkit-scrollbar-thumb,
-.sidebar-right::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: var(--radius-full);
-}
-
-.sidebar-left::-webkit-scrollbar-thumb:hover,
-.sidebar-right::-webkit-scrollbar-thumb:hover {
-    background: var(--color-bg-elevated);
-}

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { Op } from "sequelize";
 import User from "../../models/User";
 import socket from "../../io/io";
+import SocketMessages from "socket-enums-idoyahav";
 
 export async function searchUsers(req: Request, res: Response, next: NextFunction) {
     try {
@@ -125,7 +126,11 @@ export async function uploadProfilePicture(req: Request, res: Response, next: Ne
         }
         
         console.log(`📤 Backend emitting user:profile-picture-updated:`, profilePicturePayload)
-        socket.emit('user:profile-picture-updated', profilePicturePayload);
+        socket.emit(SocketMessages.NewPost, {
+            ...profilePicturePayload,
+            entityType: "profile-picture-sync",
+            targetUserIds: [String(user.id)]
+        });
 
         console.log('✅ Profile picture updated successfully');
         res.json(plainUser);

@@ -10,6 +10,7 @@ import stripeRouter from './routers/stripe'
 import openaiRouter from './routers/openai'
 import commentsRouter from './routers/comments'
 import usersRouter from './routers/users'
+import messagesRouter from './routers/messages'
 import config from 'config'
 import sequelize from './db/sequelize';
 import enforceAuth from './middlewares/enforce-auth';
@@ -46,6 +47,7 @@ app.use('/follows', followsRouter)
 app.use('/comments', commentsRouter)
 app.use('/stripe', stripeRouter)
 app.use('/openai', openaiRouter)
+app.use('/messages', messagesRouter)
 
 // not found
 app.use(notFound)

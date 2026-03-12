@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import Comment from "../../models/Comment";
 import User from "../../models/User";
 import socket from "../../io/io";
+import SocketMessages from "socket-enums-idoyahav";
 
 export async function newComment(req: Request<{ postId: string }>, res: Response, next: NextFunction) {
 
@@ -22,7 +23,7 @@ export async function newComment(req: Request<{ postId: string }>, res: Response
         }
         
         console.log(`📤 Backend emitting NewComment:`, newCommentPayload)
-        socket.emit('NewComment', newCommentPayload)
+        socket.emit(SocketMessages.NewComment, newCommentPayload)
     } catch (e) {
         next(e)
     }

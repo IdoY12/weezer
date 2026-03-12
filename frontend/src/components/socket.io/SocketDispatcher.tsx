@@ -1,19 +1,26 @@
-import { useEffect, useState, useRef, type PropsWithChildren } from "react";
+import { useContext, useEffect, useState, useRef, type PropsWithChildren } from "react";
 import { io } from "socket.io-client";
 import { v4 } from "uuid";
+import SocketMessages from "socket-enums-idoyahav";
 import { useAppDispatcher, useAppSelector } from "../../redux/hooks";
 import useUserId from "../../hooks/use-user-id";
 import SocketDispatcherContext from "./SocketDispatcherContext";
 import { newPost as profileNewPost, newComment as profileNewComment, updateUserProfilePicture as profileUpdateUserProfilePicture } from "../../redux/profile-slice";
-import { newPost as feedNewPost, newComment as feedNewComment, indicateNewContentAvailable, updateUserProfilePicture as feedUpdateUserProfilePicture } from "../../redux/feed-slice";
-import { newFollower, followerRemoved, updateUserProfilePicture as followersUpdateUserProfilePicture } from "../../redux/followers-slice";
-import { follow, unfollow, updateUserProfilePicture as followingUpdateUserProfilePicture } from "../../redux/following-slice";
+import { newComment as feedNewComment, indicateNewContentAvailable, updateUserProfilePicture as feedUpdateUserProfilePicture } from "../../redux/feed-slice";
+import { init as initFollowers, newFollower, followerRemoved, updateUserProfilePicture as followersUpdateUserProfilePicture } from "../../redux/followers-slice";
+import { init as initFollowing, follow, unfollow, updateUserProfilePicture as followingUpdateUserProfilePicture } from "../../redux/following-slice";
+import { setConversations, setUnreadCount, upsertMessage } from "../../redux/messages-slice";
+import MessagesService from "../../services/auth-aware/MessagesService";
+import AuthContext from "../auth/auth/AuthContext";
+import FollowingService from "../../services/auth-aware/FollowingService";
+import FollowersService from "../../services/auth-aware/FollowersService";
 
 export default function SocketDispatcher(props: PropsWithChildren) {
     const dispatch = useAppDispatcher();
     const userId = useUserId();
     const following = useAppSelector(state => state.followingSlice.following);
     const [clientId] = useState<string>(v4());
+    const authContext = useContext(AuthContext);
     
     // Use ref to store latest following state for use in event handlers
     const followingRef = useRef(following);
@@ -30,7 +37,10 @@ export default function SocketDispatcher(props: PropsWithChildren) {
             transports: ['websocket', 'polling'],
             reconnection: true,
             reconnectionDelay: 1000,
-            reconnectionAttempts: 5
+            reconnectionAttempts: 5,
+            auth: {
+                userId
+            }
         });
 
         socket.on('connect', () => {
@@ -47,138 +57,127 @@ export default function SocketDispatcher(props: PropsWithChildren) {
         });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        socket.on('NewPost', (payload: any) => {
+        socket.on(SocketMessages.NewPost, (payload: any) => {
             console.log(`📥 Frontend received NewPost:`, payload);
+
+            if (payload?.entityType === "conversation-list-sync") {
+                const nextConversations = payload?.conversationsByUserId?.[String(userId)] ?? [];
+                dispatch(setConversations(nextConversations));
+                return;
+            }
+            if (payload?.entityType === "unread-count-sync") {
+                const unreadCount = payload?.unreadCountByUserId?.[String(userId)] ?? 0;
+                dispatch(setUnreadCount(unreadCount));
+                return;
+            }
+            if (payload?.entityType === "profile-picture-sync") {
+                const updatePayload = { userId: payload.userId, profilePicture: payload.profilePicture };
+                dispatch(profileUpdateUserProfilePicture(updatePayload));
+                dispatch(feedUpdateUserProfilePicture(updatePayload));
+                dispatch(followersUpdateUserProfilePicture(updatePayload));
+                dispatch(followingUpdateUserProfilePicture(updatePayload));
+                return;
+            }
             
             if (payload.from === clientId) {
                 console.log(`   ⏭️ Skipping event from same client (${clientId})`);
                 return;
             }
 
+            const payloadPostUserId = String(payload?.post?.userId ?? payload?.post?.user?.id ?? '').toLowerCase();
+            const currentUserId = String(userId ?? '').toLowerCase();
+
             // If post is from current user, add to profile
-            if (payload.post.userId === userId) {
+            if (payloadPostUserId && payloadPostUserId === currentUserId) {
                 console.log(`   ✅ Adding post to profile (current user's post)`);
                 dispatch(profileNewPost(payload.post));
+                return;
             }
             
-            // Add post to feed if user is following the poster
-            // Use ref to get fresh following state
             const currentFollowing = followingRef.current;
-            const isFollowingPoster = currentFollowing.some(f => f.id === payload.post.userId || f.id === payload.post.user?.id);
-            if (isFollowingPoster && payload.post.userId !== userId) {
-                console.log(`   ✅ Adding post to feed (user follows poster)`);
-                dispatch(feedNewPost(payload.post));
-                dispatch(indicateNewContentAvailable());
+            const isFollowingPoster = currentFollowing.some(f => String(f.id).toLowerCase() === payloadPostUserId);
+            if (isFollowingPoster && payloadPostUserId && payloadPostUserId !== currentUserId) {
+                console.log(`   ✅ Queueing new post as pending content`);
+                dispatch(indicateNewContentAvailable(payload.post));
             }
         });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        socket.on('NewFollow', (payload: any) => {
+        socket.on(SocketMessages.NewFollow, (payload: any) => {
             console.log(`📥 Frontend received NewFollow:`, payload);
-            console.log(`   Current userId: ${userId} (type: ${typeof userId})`);
-            console.log(`   Payload from (clientId): ${payload.from}`);
-            console.log(`   Local clientId: ${clientId}`);
-            console.log(`   Followee ID: ${payload.followee?.id} (type: ${typeof payload.followee?.id})`);
-            console.log(`   Follower ID: ${payload.follower?.id} (type: ${typeof payload.follower?.id})`);
-            console.log(`   Followee object:`, payload.followee);
-            console.log(`   Follower object:`, payload.follower);
             
             if (!userId) {
-                console.log(`   ⚠️ No userId - user not logged in, skipping`);
                 return;
             }
+
+            window.dispatchEvent(new CustomEvent("weezer-follow-change", {
+                detail: {
+                    type: "follow",
+                    follower: payload?.follower,
+                    followee: payload?.followee
+                }
+            }));
             
             // Skip events from same client (to avoid duplicate updates from optimistic updates)
             if (payload.from === clientId) {
-                console.log(`   ⏭️ Skipping event from same client (${clientId}) - already updated optimistically`);
                 return;
             }
-            
-            // TEMPORARY DEBUG: To test if clientId check is blocking legitimate events, 
-            // comment out the above if block temporarily
 
             // Ensure string comparison
-            const followeeId = String(payload.followee?.id || '');
-            const followerId = String(payload.follower?.id || '');
-            const currentUserId = String(userId);
-
-            console.log(`   🔍 Comparing IDs:`);
-            console.log(`      currentUserId (${currentUserId}) === followeeId (${followeeId}): ${currentUserId === followeeId}`);
-            console.log(`      currentUserId (${currentUserId}) === followerId (${followerId}): ${currentUserId === followerId}`);
+            const followeeId = String(payload.followee?.id || '').toLowerCase();
+            const followerId = String(payload.follower?.id || '').toLowerCase();
+            const currentUserId = String(userId).toLowerCase();
 
             if (currentUserId === followeeId) {
-                console.log(`   ✅ I am the followee - dispatching newFollower action with:`, payload.follower);
                 dispatch(newFollower(payload.follower));
-                console.log(`   ✅ newFollower action dispatched!`);
             }
             if (currentUserId === followerId) {
-                console.log(`   ✅ I am the follower - dispatching follow action with:`, payload.followee);
                 dispatch(follow(payload.followee));
-                console.log(`   ✅ follow action dispatched!`);
-            }
-            
-            if (currentUserId !== followeeId && currentUserId !== followerId) {
-                console.log(`   ⚠️ This event is not for me - I'm neither the follower nor the followee`);
-                console.log(`   ⚠️ Current user ID: ${currentUserId}`);
-                console.log(`   ⚠️ Followee ID: ${followeeId}`);
-                console.log(`   ⚠️ Follower ID: ${followerId}`);
             }
         });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        socket.on('NewUnfollow', (payload: any) => {
+        socket.on(SocketMessages.NewUnfollow, (payload: any) => {
             console.log(`📥 Frontend received NewUnfollow:`, payload);
-            console.log(`   Current userId: ${userId} (type: ${typeof userId})`);
-            console.log(`   Payload from (clientId): ${payload.from}`);
-            console.log(`   Local clientId: ${clientId}`);
-            console.log(`   Followee ID: ${payload.followee?.id} (type: ${typeof payload.followee?.id})`);
-            console.log(`   Follower ID: ${payload.follower?.id} (type: ${typeof payload.follower?.id})`);
             
             if (!userId) {
-                console.log(`   ⚠️ No userId - user not logged in, skipping`);
                 return;
             }
+
+            window.dispatchEvent(new CustomEvent("weezer-follow-change", {
+                detail: {
+                    type: "unfollow",
+                    follower: payload?.follower,
+                    followee: payload?.followee
+                }
+            }));
             
             // Skip events from same client (to avoid duplicate updates from optimistic updates)
             if (payload.from === clientId) {
-                console.log(`   ⏭️ Skipping event from same client (${clientId}) - already updated optimistically`);
                 return;
             }
-            
-            // TEMPORARY DEBUG: To test if clientId check is blocking legitimate events, 
-            // comment out the above if block temporarily
 
             // Ensure string comparison
-            const followeeId = String(payload.followee?.id || '');
-            const followerId = String(payload.follower?.id || '');
-            const currentUserId = String(userId);
-
-            console.log(`   🔍 Comparing IDs:`);
-            console.log(`      currentUserId (${currentUserId}) === followeeId (${followeeId}): ${currentUserId === followeeId}`);
-            console.log(`      currentUserId (${currentUserId}) === followerId (${followerId}): ${currentUserId === followerId}`);
+            const followeeId = String(payload.followee?.id || '').toLowerCase();
+            const followerId = String(payload.follower?.id || '').toLowerCase();
+            const currentUserId = String(userId).toLowerCase();
 
             if (currentUserId === followeeId) {
-                console.log(`   ✅ I am the followee - dispatching followerRemoved action with ID:`, payload.follower.id);
                 dispatch(followerRemoved(payload.follower.id));
-                console.log(`   ✅ followerRemoved action dispatched!`);
             }
             if (currentUserId === followerId) {
-                console.log(`   ✅ I am the follower - dispatching unfollow action with ID:`, payload.followee.id);
                 dispatch(unfollow(payload.followee.id));
-                console.log(`   ✅ unfollow action dispatched!`);
-            }
-            
-            if (currentUserId !== followeeId && currentUserId !== followerId) {
-                console.log(`   ⚠️ This event is not for me - I'm neither the follower nor the followee`);
-                console.log(`   ⚠️ Current user ID: ${currentUserId}`);
-                console.log(`   ⚠️ Followee ID: ${followeeId}`);
-                console.log(`   ⚠️ Follower ID: ${followerId}`);
             }
         });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        socket.on('NewComment', (payload: any) => {
+        socket.on(SocketMessages.NewComment, (payload: any) => {
             console.log(`📥 Frontend received NewComment:`, payload);
+
+            if (payload?.entityType === "chat-message") {
+                dispatch(upsertMessage(payload.message));
+                return;
+            }
             
             if (payload.from === clientId) {
                 console.log(`   ⏭️ Skipping event from same client (${clientId})`);
@@ -190,28 +189,40 @@ export default function SocketDispatcher(props: PropsWithChildren) {
             dispatch(feedNewComment(payload.newComment));
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        socket.on('user:profile-picture-updated', (payload: any) => {
-            console.log(`📥 Frontend received user:profile-picture-updated:`, payload);
-            
-            if (payload.from === clientId) {
-                console.log(`   ⏭️ Skipping event from same client (${clientId})`);
-                return;
-            }
-
-            console.log(`   ✅ Updating profile picture across all slices`);
-            const updatePayload = { userId: payload.userId, profilePicture: payload.profilePicture };
-            dispatch(profileUpdateUserProfilePicture(updatePayload));
-            dispatch(feedUpdateUserProfilePicture(updatePayload));
-            dispatch(followersUpdateUserProfilePicture(updatePayload));
-            dispatch(followingUpdateUserProfilePicture(updatePayload));
-        });
-
         return () => {
             console.log('🔌 Frontend socket disconnecting...');
             socket.disconnect();
         };
     }, [dispatch, userId, clientId]); // CRITICAL: Removed 'following' from deps to prevent reconnections
+
+    useEffect(() => {
+        (async () => {
+            if (!userId) return;
+            const jwt = authContext?.jwt ?? "";
+            const messagesService = new MessagesService(jwt, clientId);
+            const followingService = new FollowingService(jwt, clientId);
+            const followersService = new FollowersService(jwt, clientId);
+
+            try {
+                const conversations = await messagesService.getConversations();
+                dispatch(setConversations(conversations));
+            } catch {
+                dispatch(setUnreadCount(0));
+            }
+
+            try {
+                const [followingFromServer, followersFromServer] = await Promise.all([
+                    followingService.getFollowing(),
+                    followersService.getFollowers()
+                ]);
+                dispatch(initFollowing(followingFromServer));
+                dispatch(initFollowers(followersFromServer));
+            } catch {
+                dispatch(initFollowing([]));
+            }
+        })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch, userId, clientId, authContext?.jwt]);
 
     const { children } = props;
 

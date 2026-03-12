@@ -6,4 +6,9 @@ export default class FollowersService extends AuthAware {
         const { data } = await this.axiosInstance<User[]>(`/follows/followers`);
         return data;
     }
+
+    async getFollowersByUserId(userId: string): Promise<User[]> {
+        const { data } = await this.axiosInstance<User[]>(`/follows/followers/${userId}`);
+        return data;
+    }
 }

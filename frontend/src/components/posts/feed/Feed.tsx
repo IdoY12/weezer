@@ -4,7 +4,7 @@ import Post from '../post/Post';
 import Spinner from '../../common/spinner/Spinner';
 import useTitle from '../../../hooks/use-title';
 import { useAppDispatcher, useAppSelector } from '../../../redux/hooks';
-import { init } from '../../../redux/feed-slice';
+import { applyPendingPosts, dismissPendingPosts, init } from '../../../redux/feed-slice';
 import SpinnerButton from '../../common/spinner-button/SpinnerButton';
 import useService from '../../../hooks/use-service';
 import FeedService from '../../../services/auth-aware/FeedService';
@@ -17,6 +17,7 @@ export default function Feed() {
 
     const feed = useAppSelector(state => state.feedSlice.posts);
     const isNewContentAvailable = useAppSelector(state => state.feedSlice.isNewContentAvailable);
+    const pendingCount = useAppSelector(state => state.feedSlice.pendingPosts.length);
     const dispatch = useAppDispatcher();
     const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(feed.length === 0);
@@ -44,8 +45,7 @@ export default function Feed() {
     async function refresh() {
         try {
             setIsRefreshing(true);
-            const feedFromServer = await feedService.getFeed();
-            dispatch(init(feedFromServer));
+            dispatch(applyPendingPosts());
         } catch (e) {
             alert(e);
         } finally {
@@ -53,21 +53,31 @@ export default function Feed() {
         }
     }
 
+    function dismiss() {
+        dispatch(dismissPendingPosts());
+    }
+
     return (
         <div className='Feed'>
             {isLoading && <Spinner />}
             
-            {!isLoading && feed.length > 0 && <>
+            {!isLoading && <>
                 {isNewContentAvailable && <div className='info-box'>
-                    you have new content available, please refresh <SpinnerButton
-                        buttonText='refresh'
-                        loadingText='refreshing'
-                        onClick={refresh}
-                        isSubmitting={isRefreshing}
-                    />
+                    <div className="info-box-text">
+                        New content available ({pendingCount}) - refresh feed?
+                    </div>
+                    <div className="info-box-actions">
+                        <SpinnerButton
+                            buttonText='Refresh'
+                            loadingText='refreshing'
+                            onClick={refresh}
+                            isSubmitting={isRefreshing}
+                        />
+                        <button onClick={dismiss} className="info-box-dismiss">Dismiss</button>
+                    </div>
                 </div>}
 
-                {feed.map(post => <Post
+                {feed.length > 0 && feed.map(post => <Post
                     key={post.id}
                     post={post}
                     isEditAllowed={false}

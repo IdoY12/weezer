@@ -4,6 +4,8 @@ import User from "../models/User";
 import Post from "../models/Post";
 import Comment from "../models/Comment";
 import Follow from "../models/Follow";
+import Conversation from "../models/Conversation";
+import Message from "../models/Message";
 
 const dbType = config.get<string>('dbType') || 'mysql';
 
@@ -14,7 +16,7 @@ if (dbType === 'sqlite') {
     sequelizeConfig = {
         dialect: 'sqlite',
         storage: './test-database.sqlite',
-        models: [User, Post, Comment, Follow],
+            models: [User, Post, Comment, Follow, Conversation, Message],
         logging: console.log
     };
 } else {
@@ -22,7 +24,7 @@ if (dbType === 'sqlite') {
     sequelizeConfig = {
         ...config.get('db'),
         dialect: 'mysql',
-        models: [User, Post, Comment, Follow],
+        models: [User, Post, Comment, Follow, Conversation, Message],
         logging: console.log
     };
 }

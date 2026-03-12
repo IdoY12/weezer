@@ -1,28 +1,34 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type User from '../../../models/user';
 import SpinnerButton from '../../common/spinner-button/SpinnerButton';
 import './Follow.css';
 import { useAppDispatcher, useAppSelector } from '../../../redux/hooks';
 import { follow, unfollow } from '../../../redux/following-slice';
-import { indicateNewContentAvailable } from '../../../redux/feed-slice';
 import useService from '../../../hooks/use-service';
 import FollowingService from '../../../services/auth-aware/FollowingService';
 import ProfilePicture from '../../common/profile-picture/ProfilePicture';
 
 interface FollowProps {
     user: User
+    showMessageButton?: boolean
+    onNavigateToProfile?(): void
 }
 export default function Follow(props: FollowProps) {
 
-    const { user } = props;
+    const { user, showMessageButton = true, onNavigateToProfile } = props;
 
-    const { id, name } = user;
+    const { id, name, username } = user;
+    const targetUserId = String(id).toLowerCase();
 
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-    const amIFollowing = useAppSelector(store => store.followingSlice.following.findIndex(f => f.id === id) > -1);
+    const amIFollowing = useAppSelector(
+        store => store.followingSlice.following.findIndex(f => String(f.id).toLowerCase() === targetUserId) > -1
+    );
 
     const dispatch = useAppDispatcher();
+    const navigate = useNavigate();
 
     const followingService = useService(FollowingService);
 
@@ -31,8 +37,13 @@ export default function Follow(props: FollowProps) {
             setIsSubmitting(true);
             await followingService.unfollow(id);
             dispatch(unfollow(id));
-            dispatch(indicateNewContentAvailable());
-        } catch (e) {
+        } catch (e: any) {
+            const message = String(e?.response?.data || e?.message || '').toLowerCase();
+            // Defensive sync: server says no follow exists -> local UI must show "follow".
+            if (message.includes('followee not found') || message.includes('follow does not exist')) {
+                dispatch(unfollow(id));
+                return;
+            }
             alert(e);
         } finally {
             setIsSubmitting(false);
@@ -44,19 +55,34 @@ export default function Follow(props: FollowProps) {
             setIsSubmitting(true);
             await followingService.follow(id);
             dispatch(follow(user));
-            dispatch(indicateNewContentAvailable());
-        } catch (e) {
+        } catch (e: any) {
+            const message = String(e?.response?.data || e?.message || '').toLowerCase();
+            // Defensive sync: server says follow exists -> local UI must show "unfollow".
+            if (message.includes('follow already exists')) {
+                dispatch(follow(user));
+                return;
+            }
             alert(e);
         } finally {
             setIsSubmitting(false);
         }
     }
 
+    function openChat() {
+        navigate(`/messages/new/${id}`);
+    }
+
+    function openProfile() {
+        onNavigateToProfile?.();
+        navigate(`/profile/${id}`);
+    }
 
     return (
         <div className='Follow'>
             <ProfilePicture user={user} size={50} />
-            <div>{name}</div>
+            <button onClick={openProfile}>
+                {name} <span>@{username}</span>
+            </button>
             <div>
                 {amIFollowing && <SpinnerButton
                     onClick={unfollowMe}
@@ -73,6 +99,11 @@ export default function Follow(props: FollowProps) {
                 />}
 
             </div>
+            {showMessageButton && (
+                <div>
+                    <button onClick={openChat}>message</button>
+                </div>
+            )}
         </div>
     );
 }

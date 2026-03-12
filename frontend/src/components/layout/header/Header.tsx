@@ -4,11 +4,13 @@ import { useContext } from 'react';
 import AuthContext from '../../auth/auth/AuthContext';
 import useCurrentUser from '../../../hooks/use-current-user';
 import ProfilePicture from '../../common/profile-picture/ProfilePicture';
+import { useAppSelector } from '../../../redux/hooks';
 
 export default function Header() {
     const authContext = useContext(AuthContext);
 
     const { user } = useCurrentUser();
+    const unreadMessages = useAppSelector(state => state.messagesSlice.unreadCount);
 
     function logout() {
         authContext?.newJwt('');
@@ -48,23 +50,12 @@ export default function Header() {
                     </svg>
                     <span>Search</span>
                 </NavLink>
-                <NavLink to="/following" className="nav-link">
+                <NavLink to="/messages" className="nav-link">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg>
-                    <span>Following</span>
-                </NavLink>
-                <NavLink to="/followers" className="nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
-                    <span>Followers</span>
+                    <span>Messages</span>
+                    {unreadMessages > 0 && <span className='messages-badge'>{unreadMessages}</span>}
                 </NavLink>
                 <NavLink to="/translations" className="nav-link nav-link-translate">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

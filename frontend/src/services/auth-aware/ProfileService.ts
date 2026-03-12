@@ -9,6 +9,11 @@ export default class ProfileService extends AuthAware {
         return response.data;
     }
 
+    async getProfileByUserId(userId: string): Promise<Post[]> {
+        const response = await this.axiosInstance.get<Post[]>(`/profile/user/${userId}`);
+        return response.data;
+    }
+
     async remove(id: string): Promise<boolean> {
         const response = await this.axiosInstance.delete(`/profile/${id}`);
         return response.data;

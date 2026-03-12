@@ -8,6 +8,8 @@ import Following from "../../follows/following/Following";
 import Followers from "../../follows/followers/Followers";
 import Search from "../../search/Search";
 import Settings from "../../settings/Settings";
+import MessagesInbox from "../../messages/inbox/MessagesInbox";
+import ChatPage from "../../messages/chat/ChatPage";
 
 export default function Main() {
     return (
@@ -15,6 +17,7 @@ export default function Main() {
             {/* <Route path="/" element={<Profile />} /> */}
             <Route path="/" element={<Navigate to="/profile" />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/profile/edit/:id" element={<EditPost />} />
             <Route path="/feed" element={<Feed />} />
             <Route path="/following" element={<Following />} />
@@ -22,6 +25,9 @@ export default function Main() {
             <Route path="/search" element={<Search />} />
             <Route path="/translations" element={<Translations />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/messages" element={<MessagesInbox />} />
+            <Route path="/messages/:conversationId" element={<ChatPage />} />
+            <Route path="/messages/new/:userId" element={<ChatPage />} />
             <Route path="/signup" element={<Navigate to="/profile" />} />
             <Route path="/login" element={<Navigate to="/profile" />} />
             <Route path="*" element={<NotFound />} />

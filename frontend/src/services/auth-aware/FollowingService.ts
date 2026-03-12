@@ -7,6 +7,11 @@ export default class FollowingService extends AuthAware {
         return data;
     }
 
+    async getFollowingByUserId(userId: string): Promise<User[]> {
+        const { data } = await this.axiosInstance<User[]>(`/follows/following/${userId}`);
+        return data;
+    }
+
     async unfollow(userId: string): Promise<boolean> {
         const { data } = await this.axiosInstance.post<boolean>(`/follows/unfollow/${userId}`);
         return data;

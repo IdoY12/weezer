@@ -2,18 +2,19 @@ import { NextFunction, Request, Response } from "express";
 import User from "../../models/User";
 import Follow from "../../models/Follow";
 import socket from "../../io/io";
+import SocketMessages from "socket-enums-idoyahav";
 
 export async function getFollowing(req: Request, res: Response, next: NextFunction) {
     try {
-
-        const { following } = await User.findByPk(req.userId, {
+        const targetUserId = String(req.params.id ?? req.userId);
+        const user = await User.findByPk(targetUserId, {
             include: [{
                 model: User,
                 as: 'following'
             }]
         })
 
-        res.json(following)
+        res.json(user?.following ?? [])
 
     } catch (e) {
         next(e)
@@ -22,15 +23,15 @@ export async function getFollowing(req: Request, res: Response, next: NextFuncti
 
 export async function getFollowers(req: Request, res: Response, next: NextFunction) {
     try {
-
-        const { followers } = await User.findByPk(req.userId, {
+        const targetUserId = String(req.params.id ?? req.userId);
+        const user = await User.findByPk(targetUserId, {
             include: [{
                 model: User,
                 as: 'followers'
             }]
         })
 
-        res.json(followers)
+        res.json(user?.followers ?? [])
     } catch (e) {
         next(e)
     }
@@ -60,7 +61,8 @@ export async function follow(req: Request<{ id: string }>, res: Response, next: 
         const followPayload = {
             from: req.get('x-client-id'),
             followee,
-            follower
+            follower,
+            targetUserIds: [String(req.userId), String(req.params.id)]
         }
         
         console.log(`📤 Backend emitting NewFollow:`)
@@ -68,7 +70,11 @@ export async function follow(req: Request<{ id: string }>, res: Response, next: 
         console.log(`   Follower ID: ${follower.id} (type: ${typeof follower.id})`)
         console.log(`   Client ID (from): ${followPayload.from}`)
         console.log(`   Full payload:`, JSON.stringify(followPayload, null, 2))
-        socket.emit('NewFollow', followPayload)
+        socket.emit(SocketMessages.NewFollow, followPayload)
+        socket.emit(SocketMessages.NewFollow, {
+            ...followPayload,
+            entityType: "follow-sync-global"
+        })
 
     } catch (e) {
         if (e.message === 'follow already exists') return next({
@@ -99,7 +105,8 @@ export async function unfollow(req: Request<{ id: string }>, res: Response, next
         const unfollowPayload = {
             from: req.get("x-client-id"),
             follower,
-            followee
+            followee,
+            targetUserIds: [String(req.userId), String(req.params.id)]
         }
         
         console.log(`📤 Backend emitting NewUnfollow:`)
@@ -107,7 +114,11 @@ export async function unfollow(req: Request<{ id: string }>, res: Response, next
         console.log(`   Follower ID: ${follower.id} (type: ${typeof follower.id})`)
         console.log(`   Client ID (from): ${unfollowPayload.from}`)
         console.log(`   Full payload:`, JSON.stringify(unfollowPayload, null, 2))
-        socket.emit('NewUnfollow', unfollowPayload)
+        socket.emit(SocketMessages.NewUnfollow, unfollowPayload)
+        socket.emit(SocketMessages.NewUnfollow, {
+            ...unfollowPayload,
+            entityType: "follow-sync-global"
+        })
     } catch (e) {
         console.log(e)
         if (e.message === 'followee not found') return next({

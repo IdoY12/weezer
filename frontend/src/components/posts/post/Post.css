@@ -4,39 +4,16 @@
    ===================================================== */
 
 .Post {
-    background: var(--gradient-card);
+    background: #16181c;
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
+    border-radius: 12px;
     padding: var(--space-6);
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
-    transition: all var(--transition-base);
+    transition: border-color 100ms ease;
     position: relative;
     overflow: hidden;
-    animation: fadeInUp var(--transition-slow) ease-out both;
-    box-shadow: var(--shadow-md), var(--shadow-inset);
-}
-
-/* Subtle gradient overlay on hover */
-.Post::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 107, 107, 0.03) 0%, transparent 50%);
-    opacity: 0;
-    transition: opacity var(--transition-base);
-    pointer-events: none;
-}
-
-.Post:hover {
-    border-color: rgba(255, 107, 107, 0.3);
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg), 0 0 40px rgba(255, 107, 107, 0.1);
-}
-
-.Post:hover::before {
-    opacity: 1;
 }
 
 /* =====================================================
@@ -97,11 +74,7 @@
     object-fit: cover;
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-border);
-    transition: transform var(--transition-base);
-}
-
-.Post:hover img {
-    transform: scale(1.01);
+    transition: none;
 }
 
 /* =====================================================
@@ -129,7 +102,7 @@
     background: var(--color-bg-tertiary);
     color: var(--color-text-secondary);
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 
 .Post button:hover {
@@ -148,7 +121,6 @@
 .Post button:first-of-type:hover {
     background: var(--color-error);
     color: white;
-    box-shadow: 0 0 20px rgba(248, 81, 73, 0.3);
 }
 
 /* Edit button - primary style */
@@ -159,32 +131,15 @@
 }
 
 .Post button:last-of-type:hover {
-    background: var(--gradient-primary);
+    background: var(--color-primary);
     color: white;
-    box-shadow: var(--shadow-glow-primary);
 }
 
 /* =====================================================
    NEW POST ANIMATION
    ===================================================== */
 .new-post {
-    animation: newPostPulse 2s ease-out;
     border-color: var(--color-primary);
-}
-
-@keyframes newPostPulse {
-    0% {
-        box-shadow: 0 0 0 0 var(--color-primary-glow);
-        transform: scale(0.98);
-    }
-    50% {
-        box-shadow: 0 0 0 20px transparent;
-        transform: scale(1);
-    }
-    100% {
-        box-shadow: var(--shadow-md);
-        transform: scale(1);
-    }
 }
 
 /* =====================================================

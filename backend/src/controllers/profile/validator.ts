@@ -16,3 +16,7 @@ export const updatePostValidator = newPostValidator
 export const getPostValidator = Joi.object({
     id: Joi.string().uuid()
 })
+
+export const getUserProfileValidator = Joi.object({
+    userId: Joi.string().uuid().required()
+})

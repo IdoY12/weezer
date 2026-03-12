@@ -3,6 +3,7 @@ import Post from "../../models/Post";
 import User from "../../models/User";
 import postIncludes from "../common/post-includes";
 import socket from "../../io/io";
+import SocketMessages from "socket-enums-idoyahav";
 
 export async function getProfile(req: Request, res: Response, next: NextFunction) {
 
@@ -18,6 +19,21 @@ export async function getProfile(req: Request, res: Response, next: NextFunction
         res.json(posts)
     } catch (e) {
         next(e)
+    }
+}
+
+export async function getProfileByUserId(req: Request<{ userId: string }>, res: Response, next: NextFunction) {
+    try {
+        const user = await User.findByPk(req.params.userId, {
+            include: [{
+                model: Post,
+                ...postIncludes
+            }]
+        });
+
+        res.json(user?.posts ?? []);
+    } catch (e) {
+        next(e);
     }
 }
 
@@ -69,7 +85,7 @@ export async function createPost(req: Request, res: Response, next: NextFunction
         }
         
         console.log(`📤 Backend emitting NewPost:`, newPostPayload)
-        socket.emit('NewPost', newPostPayload)
+        socket.emit(SocketMessages.NewPost, newPostPayload)
 
     } catch (e) {
         next(e)
