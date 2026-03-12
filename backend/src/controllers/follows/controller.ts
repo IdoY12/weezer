@@ -64,12 +64,7 @@ export async function follow(req: Request<{ id: string }>, res: Response, next: 
             follower,
             targetUserIds: [String(req.userId), String(req.params.id)]
         }
-        
-        console.log(`📤 Backend emitting NewFollow:`)
-        console.log(`   Followee ID: ${followee.id} (type: ${typeof followee.id})`)
-        console.log(`   Follower ID: ${follower.id} (type: ${typeof follower.id})`)
-        console.log(`   Client ID (from): ${followPayload.from}`)
-        console.log(`   Full payload:`, JSON.stringify(followPayload, null, 2))
+
         socket.emit(SocketMessages.NewFollow, followPayload)
         socket.emit(SocketMessages.NewFollow, {
             ...followPayload,
@@ -108,19 +103,13 @@ export async function unfollow(req: Request<{ id: string }>, res: Response, next
             followee,
             targetUserIds: [String(req.userId), String(req.params.id)]
         }
-        
-        console.log(`📤 Backend emitting NewUnfollow:`)
-        console.log(`   Followee ID: ${followee.id} (type: ${typeof followee.id})`)
-        console.log(`   Follower ID: ${follower.id} (type: ${typeof follower.id})`)
-        console.log(`   Client ID (from): ${unfollowPayload.from}`)
-        console.log(`   Full payload:`, JSON.stringify(unfollowPayload, null, 2))
+
         socket.emit(SocketMessages.NewUnfollow, unfollowPayload)
         socket.emit(SocketMessages.NewUnfollow, {
             ...unfollowPayload,
             entityType: "follow-sync-global"
         })
     } catch (e) {
-        console.log(e)
         if (e.message === 'followee not found') return next({
             status: 422,
             message: 'followee not found'

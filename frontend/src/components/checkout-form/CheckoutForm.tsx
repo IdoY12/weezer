@@ -32,8 +32,6 @@ export function CheckoutForm() {
             }
         })
 
-        console.log( 'hello idodod' , stripeResponse)
-
         if(stripeResponse.error) {
             setErrorMessage(stripeResponse.error.message!)
         }

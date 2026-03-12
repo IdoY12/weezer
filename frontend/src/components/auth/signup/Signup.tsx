@@ -20,12 +20,33 @@ export default function Signup() {
 
     const password = watch('password');
 
+    function extractErrorMessage(error: unknown): string {
+        const fallback = "Signup failed. Please try again.";
+        if (!error || typeof error !== "object") return fallback;
+
+        const maybeError = error as { response?: { data?: unknown }, message?: string };
+        const responseData = maybeError.response?.data;
+        if (typeof responseData === "string") return responseData;
+        if (responseData && typeof responseData === "object") {
+            const maybeMessage = responseData as { message?: string, error?: string };
+            return maybeMessage.message || maybeMessage.error || fallback;
+        }
+        if (typeof maybeError.message === "string" && maybeError.message.trim()) {
+            return maybeError.message;
+        }
+        return fallback;
+    }
+
     async function submit(signupData: SignupModel) {
         try {
             setIsSubmitting(true);
             
-            // Remove confirmPassword before sending to backend
-            const { confirmPassword, ...signupPayload } = signupData;
+            const signupPayload = {
+                name: signupData.name,
+                email: signupData.email,
+                username: signupData.username,
+                password: signupData.password
+            };
             const { jwt } = await authService.signup(signupPayload);
             authContext?.newJwt(jwt);
 
@@ -39,28 +60,8 @@ export default function Signup() {
                     console.error('Failed to upload profile picture:', e);
                 }
             }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (e: any) {
-            let errorMessage = "Signup failed. Please try again.";
-            
-            if (e?.response) {
-                // Backend sends error messages as plain text in the response body
-                // For 422 validation errors and other errors, the message is in response.data
-                const responseData = e.response.data;
-                
-                if (typeof responseData === 'string') {
-                    // Plain text error message
-                    errorMessage = responseData;
-                } else if (responseData && typeof responseData === 'object') {
-                    // JSON error response (if backend sends JSON in the future)
-                    errorMessage = responseData.message || responseData.error || errorMessage;
-                }
-            } else if (e?.message) {
-                // Network error or other error without response
-                errorMessage = e.message;
-            }
-            
-            setError("root", { message: errorMessage });
+        } catch (e: unknown) {
+            setError("root", { message: extractErrorMessage(e) });
         } finally {
             setIsSubmitting(false);
         }

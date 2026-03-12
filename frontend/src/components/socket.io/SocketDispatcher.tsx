@@ -30,8 +30,6 @@ export default function SocketDispatcher(props: PropsWithChildren) {
 
     useEffect(() => {
         const socketUrl = import.meta.env.VITE_IO_SERVER_URL;
-        console.log(`🔌 Frontend connecting to Socket.io server at: ${socketUrl}`);
-        console.log(`🆔 Client ID: ${clientId}`);
 
         const socket = io(socketUrl, {
             transports: ['websocket', 'polling'],
@@ -43,23 +41,12 @@ export default function SocketDispatcher(props: PropsWithChildren) {
             }
         });
 
-        socket.on('connect', () => {
-            console.log('✅ Frontend socket connected to IO server!');
-            console.log(`   Socket ID: ${socket.id}`);
-        });
-
         socket.on('connect_error', (error) => {
             console.error('❌ Frontend socket connection error:', error.message);
         });
 
-        socket.on('disconnect', (reason) => {
-            console.log(`⚠️ Frontend socket disconnected: ${reason}`);
-        });
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         socket.on(SocketMessages.NewPost, (payload: any) => {
-            console.log(`📥 Frontend received NewPost:`, payload);
-
             if (payload?.entityType === "conversation-list-sync") {
                 const nextConversations = payload?.conversationsByUserId?.[String(userId)] ?? [];
                 dispatch(setConversations(nextConversations));
@@ -80,7 +67,6 @@ export default function SocketDispatcher(props: PropsWithChildren) {
             }
             
             if (payload.from === clientId) {
-                console.log(`   ⏭️ Skipping event from same client (${clientId})`);
                 return;
             }
 
@@ -89,7 +75,6 @@ export default function SocketDispatcher(props: PropsWithChildren) {
 
             // If post is from current user, add to profile
             if (payloadPostUserId && payloadPostUserId === currentUserId) {
-                console.log(`   ✅ Adding post to profile (current user's post)`);
                 dispatch(profileNewPost(payload.post));
                 return;
             }
@@ -97,15 +82,12 @@ export default function SocketDispatcher(props: PropsWithChildren) {
             const currentFollowing = followingRef.current;
             const isFollowingPoster = currentFollowing.some(f => String(f.id).toLowerCase() === payloadPostUserId);
             if (isFollowingPoster && payloadPostUserId && payloadPostUserId !== currentUserId) {
-                console.log(`   ✅ Queueing new post as pending content`);
                 dispatch(indicateNewContentAvailable(payload.post));
             }
         });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         socket.on(SocketMessages.NewFollow, (payload: any) => {
-            console.log(`📥 Frontend received NewFollow:`, payload);
-            
             if (!userId) {
                 return;
             }
@@ -138,8 +120,6 @@ export default function SocketDispatcher(props: PropsWithChildren) {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         socket.on(SocketMessages.NewUnfollow, (payload: any) => {
-            console.log(`📥 Frontend received NewUnfollow:`, payload);
-            
             if (!userId) {
                 return;
             }
@@ -172,25 +152,20 @@ export default function SocketDispatcher(props: PropsWithChildren) {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         socket.on(SocketMessages.NewComment, (payload: any) => {
-            console.log(`📥 Frontend received NewComment:`, payload);
-
             if (payload?.entityType === "chat-message") {
                 dispatch(upsertMessage(payload.message));
                 return;
             }
             
             if (payload.from === clientId) {
-                console.log(`   ⏭️ Skipping event from same client (${clientId})`);
                 return;
             }
 
-            console.log(`   ✅ Adding comment to profile and feed`);
             dispatch(profileNewComment(payload.newComment));
             dispatch(feedNewComment(payload.newComment));
         });
 
         return () => {
-            console.log('🔌 Frontend socket disconnecting...');
             socket.disconnect();
         };
     }, [dispatch, userId, clientId]); // CRITICAL: Removed 'following' from deps to prevent reconnections
@@ -221,7 +196,6 @@ export default function SocketDispatcher(props: PropsWithChildren) {
                 dispatch(initFollowing([]));
             }
         })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch, userId, clientId, authContext?.jwt]);
 
     const { children } = props;

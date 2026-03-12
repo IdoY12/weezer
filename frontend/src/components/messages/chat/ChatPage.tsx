@@ -8,6 +8,8 @@ import useUserId from "../../../hooks/use-user-id";
 import "./ChatPage.css";
 
 export default function ChatPage() {
+    // Route supports both existing conversations (/messages/:conversationId)
+    // and starting a new one from profile/follows (/messages/new/:userId).
     const { conversationId, userId } = useParams<"conversationId" | "userId">();
     const currentUserId = useUserId();
     const messagesService = useService(MessagesService);

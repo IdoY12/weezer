@@ -30,6 +30,18 @@ export default function ProfilePictureUpload({ user, onUploadComplete, size = 12
 
     const currentImageUrl = getProfilePictureUrl(user.profilePicture);
 
+    function getUploadErrorMessage(error: unknown): string {
+        if (!error || typeof error !== "object") return 'Failed to upload profile picture. Please try again.';
+        const maybeError = error as { response?: { data?: unknown }, message?: string };
+        const responseData = maybeError.response?.data;
+        if (responseData && typeof responseData === "object") {
+            const dataWithMessage = responseData as { message?: string };
+            if (typeof dataWithMessage.message === "string") return dataWithMessage.message;
+        }
+        if (typeof maybeError.message === "string" && maybeError.message.trim()) return maybeError.message;
+        return 'Failed to upload profile picture. Please try again.';
+    }
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -78,10 +90,10 @@ export default function ProfilePictureUpload({ user, onUploadComplete, size = 12
                 fileInputRef.current.value = '';
             }
             onUploadComplete?.(updatedUser);
-        } catch (e: any) {
+        } catch (e: unknown) {
             // Rollback on error - clear preview to show original image
             setPreview(null);
-            setError(e?.response?.data?.message || 'Failed to upload profile picture. Please try again.');
+            setError(getUploadErrorMessage(e));
         } finally {
             setIsUploading(false);
         }

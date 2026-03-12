@@ -32,13 +32,22 @@ export default function Follow(props: FollowProps) {
 
     const followingService = useService(FollowingService);
 
+    function getErrorMessage(error: unknown): string {
+        if (!error || typeof error !== "object") return "";
+        const maybeError = error as { response?: { data?: unknown }, message?: string };
+        const responseData = maybeError.response?.data;
+        if (typeof responseData === "string") return responseData.toLowerCase();
+        if (typeof maybeError.message === "string") return maybeError.message.toLowerCase();
+        return "";
+    }
+
     async function unfollowMe() {
         try {
             setIsSubmitting(true);
             await followingService.unfollow(id);
             dispatch(unfollow(id));
-        } catch (e: any) {
-            const message = String(e?.response?.data || e?.message || '').toLowerCase();
+        } catch (e: unknown) {
+            const message = getErrorMessage(e);
             // Defensive sync: server says no follow exists -> local UI must show "follow".
             if (message.includes('followee not found') || message.includes('follow does not exist')) {
                 dispatch(unfollow(id));
@@ -55,8 +64,8 @@ export default function Follow(props: FollowProps) {
             setIsSubmitting(true);
             await followingService.follow(id);
             dispatch(follow(user));
-        } catch (e: any) {
-            const message = String(e?.response?.data || e?.message || '').toLowerCase();
+        } catch (e: unknown) {
+            const message = getErrorMessage(e);
             // Defensive sync: server says follow exists -> local UI must show "unfollow".
             if (message.includes('follow already exists')) {
                 dispatch(follow(user));

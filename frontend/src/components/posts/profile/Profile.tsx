@@ -141,14 +141,23 @@ export default function Profile() {
         navigate(`/messages/new/${viewedUser.id}`);
     }
 
+    function getErrorMessage(error: unknown): string {
+        if (!error || typeof error !== "object") return "";
+        const maybeError = error as { response?: { data?: unknown }, message?: string };
+        const responseData = maybeError.response?.data;
+        if (typeof responseData === "string") return responseData.toLowerCase();
+        if (typeof maybeError.message === "string") return maybeError.message.toLowerCase();
+        return "";
+    }
+
     async function followViewedUser() {
         if (!viewedUser) return;
         try {
             setIsFollowSubmitting(true);
             await followingService.follow(viewedUser.id);
             dispatch(followAction(viewedUser));
-        } catch (e: any) {
-            const message = String(e?.response?.data || e?.message || '').toLowerCase();
+        } catch (e: unknown) {
+            const message = getErrorMessage(e);
             if (message.includes('follow already exists')) {
                 dispatch(followAction(viewedUser));
                 return;
@@ -165,8 +174,8 @@ export default function Profile() {
             setIsFollowSubmitting(true);
             await followingService.unfollow(viewedUser.id);
             dispatch(unfollowAction(viewedUser.id));
-        } catch (e: any) {
-            const message = String(e?.response?.data || e?.message || '').toLowerCase();
+        } catch (e: unknown) {
+            const message = getErrorMessage(e);
             if (message.includes('followee not found') || message.includes('follow does not exist')) {
                 dispatch(unfollowAction(viewedUser.id));
                 return;

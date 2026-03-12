@@ -14,7 +14,6 @@ import ChatPage from "../../messages/chat/ChatPage";
 export default function Main() {
     return (
         <Routes>
-            {/* <Route path="/" element={<Profile />} /> */}
             <Route path="/" element={<Navigate to="/profile" />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:userId" element={<Profile />} />
