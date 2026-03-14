@@ -29,7 +29,7 @@ router.get('/google/callback',
     
     const {password, email, googleId, ...user} = req.user as any
     const jwt = sign(user, jwtSecret)
-    res.redirect(`https://gevatron.netlify.app?jwt=${jwt}`);
+    res.redirect(`http://localhost:3012?jwt=${jwt}`);
 });
 
 export default router
