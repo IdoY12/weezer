@@ -9,6 +9,7 @@
 .env.test.local
 .env.production
 .env.production.local
+.secret
 
 # SQLite databases
 *.db

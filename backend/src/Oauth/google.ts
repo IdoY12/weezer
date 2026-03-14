@@ -32,7 +32,7 @@ interface GoogleProfile {
 passport.use(new GoogleStrategy({
     clientID: config.get<string>('google.clientId'),
     clientSecret: config.get<string>('google.clientSecret'),
-    callbackURL: "http://localhost:3012/auth/google/callback",
+    callbackURL: "http://localhost:3020/auth/google/callback",
     passReqToCallback: true
 },
     async function (request, accessToken, refreshToken, profile: GoogleProfile, done: VerifyCallback) {

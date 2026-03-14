@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import useService from "../../../hooks/use-service";
 import MessagesService from "../../../services/auth-aware/MessagesService";
@@ -19,6 +19,8 @@ export default function ChatPage() {
     const [resolvedConversationId, setResolvedConversationId] = useState<string>(conversationId ?? "");
     const [content, setContent] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const isMarkingReadRef = useRef<boolean>(false);
+    const lastAutoMarkKeyRef = useRef<string>("");
 
     const messages = useMemo(
         () => messagesByConversationId[resolvedConversationId] ?? [],
@@ -44,6 +46,38 @@ export default function ChatPage() {
         })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conversationId, dispatch]);
+
+    useEffect(() => {
+        if (!resolvedConversationId || !currentUserId) {
+            return;
+        }
+
+        const unreadIncomingMessageIds = messages
+            .filter(message => message.senderId !== currentUserId && !message.readAt)
+            .map(message => message.id)
+            .sort();
+
+        if (unreadIncomingMessageIds.length === 0) {
+            lastAutoMarkKeyRef.current = "";
+            return;
+        }
+
+        const nextMarkKey = `${resolvedConversationId}:${unreadIncomingMessageIds.join("|")}`;
+        if (isMarkingReadRef.current || lastAutoMarkKeyRef.current === nextMarkKey) {
+            return;
+        }
+
+        lastAutoMarkKeyRef.current = nextMarkKey;
+        isMarkingReadRef.current = true;
+
+        (async () => {
+            try {
+                await messagesService.markConversationAsRead(resolvedConversationId);
+            } finally {
+                isMarkingReadRef.current = false;
+            }
+        })();
+    }, [messages, resolvedConversationId, currentUserId, messagesService]);
 
     async function sendMessage() {
         const targetUserId = userId || activeConversation?.otherUser?.id;

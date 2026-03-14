@@ -23,6 +23,8 @@ services:
   
   backend:
     container_name: weezer-backend-compose
+    env_file:
+      - .secret
     environment:
       - NODE_ENV=compose
     ports:

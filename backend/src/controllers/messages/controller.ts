@@ -6,6 +6,19 @@ import Message from "../../models/Message";
 import User from "../../models/User";
 import socket from "../../io/io";
 
+let ensureMessagesTablesReadyPromise: Promise<void> | null = null;
+
+async function ensureMessagesTablesReady(): Promise<void> {
+    if (!ensureMessagesTablesReadyPromise) {
+        ensureMessagesTablesReadyPromise = (async () => {
+            await Conversation.sync();
+            await Message.sync();
+        })();
+    }
+
+    await ensureMessagesTablesReadyPromise;
+}
+
 function normalizeParticipants(userA: string, userB: string): [string, string] {
     return userA < userB ? [userA, userB] : [userB, userA];
 }
@@ -67,6 +80,7 @@ async function buildConversationList(currentUserId: string) {
 
 export async function getConversations(req: Request, res: Response, next: NextFunction) {
     try {
+        await ensureMessagesTablesReady();
         const list = await buildConversationList(req.userId);
         res.json(list);
     } catch (e) {
@@ -76,6 +90,7 @@ export async function getConversations(req: Request, res: Response, next: NextFu
 
 export async function getConversationMessages(req: Request<{ conversationId: string }>, res: Response, next: NextFunction) {
     try {
+        await ensureMessagesTablesReady();
         const conversation = await Conversation.findByPk(req.params.conversationId);
         if (!conversation) {
             return next({ status: 404, message: "conversation not found" });
@@ -103,6 +118,7 @@ export async function getConversationMessages(req: Request<{ conversationId: str
 
 export async function sendMessageToUser(req: Request<{ userId: string }, unknown, { content: string }>, res: Response, next: NextFunction) {
     try {
+        await ensureMessagesTablesReady();
         if (req.userId === req.params.userId) {
             return next({ status: 422, message: "cannot message yourself" });
         }
@@ -175,6 +191,7 @@ export async function sendMessageToUser(req: Request<{ userId: string }, unknown
 
 export async function markConversationAsRead(req: Request<{ conversationId: string }>, res: Response, next: NextFunction) {
     try {
+        await ensureMessagesTablesReady();
         const conversation = await Conversation.findByPk(req.params.conversationId);
         if (!conversation) {
             return next({ status: 404, message: "conversation not found" });
