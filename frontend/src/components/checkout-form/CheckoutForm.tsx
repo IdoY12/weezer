@@ -28,7 +28,7 @@ export function CheckoutForm() {
             elements: elements!,
             clientSecret,
             confirmParams: {
-                return_url: 'http://localhost:5173/translations'
+                return_url: `${import.meta.env.VITE_CLIENT_URL}/translations`
             }
         })
 
