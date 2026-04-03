@@ -1,5 +1,6 @@
 {
     "app": {
-        "name": "weezer prod"
+        "name": "weezer prod",
+        "secureCookies": true
     }
 }

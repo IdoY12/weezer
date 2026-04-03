@@ -18,8 +18,8 @@ export default function Login() {
     async function submit(login: LoginModel) {
         try {
             setIsSubmitting(true);
-            const { jwt } = await authService.login(login);
-            authContext?.newJwt(jwt);
+            const { user } = await authService.login(login);
+            authContext?.setUser(user);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             setError("root", { message: e?.response?.data || "Invalid username or password" });

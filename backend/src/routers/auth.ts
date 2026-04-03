@@ -1,15 +1,19 @@
 import { Router } from "express";
-import { login, signup } from "../controllers/auth/controller";
+import { login, signup, me, logout, getCsrf } from "../controllers/auth/controller";
 import validation from "../middlewares/validation";
 import { loginValidator, signupValidator } from "../controllers/auth/validator";
 import passport from "../Oauth/google";
 import { sign } from "jsonwebtoken";
 import config from "config";
+import { issueCsrfCookie, secureCookiesEnabled } from "../middlewares/csrf";
 
 const router = Router()
 
+router.get('/csrf', getCsrf)
 router.post('/signup', validation(signupValidator), signup)
 router.post('/login', validation(loginValidator), login)
+router.get('/me', me)
+router.post('/logout', logout)
 
 router.get('/google', passport.authenticate('google', { 
     scope: ['profile', 'email'], 
@@ -26,10 +30,19 @@ router.get('/google/callback',
   }),
   function(req, res) {
     const jwtSecret = config.get<string>('app.jwtSecret')
+    const clientOrigin = config.get<string>('app.clientOrigin')
     
     const {password, email, googleId, ...user} = req.user as any
     const jwt = sign(user, jwtSecret)
-    res.redirect(`http://localhost:3012?jwt=${jwt}`);
+    // OAuth callback: same session + CSRF setup as password auth (JWT httpOnly cookie; CSRF readable by same-origin JS).
+    res.cookie('jwt', jwt, {
+        httpOnly: true,
+        secure: secureCookiesEnabled(),
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    issueCsrfCookie(res)
+    res.redirect(clientOrigin);
 });
 
 export default router

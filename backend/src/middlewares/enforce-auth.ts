@@ -16,36 +16,23 @@ export default function enforceAuth(req: Request, res: Response, next: NextFunct
 
     const jwtSecret = config.get<string>('app.jwtSecret')
 
-    const authHeader = req.get('Authorization') // this will get the value for the Authorization header
+    const token = req.cookies?.jwt
 
-    if (!authHeader) return next({
+    if (!token) return next({
         status: 401,
-        message: 'missing Authorization header'
-    })
-
-    if (!authHeader.startsWith('Bearer')) return next({
-        status: 401,
-        message: 'missing Bearer keyword'
-    })
-
-    const parts = authHeader.split(' ')
-    const jwt = parts[1]
-
-    if (!jwt) return next({
-        status: 401,
-        message: 'missing jwt'
+        message: 'not authenticated',
     })
 
     try {
-        const user = verify(jwt, jwtSecret) as User
+        const user = verify(token, jwtSecret) as User
         req.userId = user.id
         console.log(user)
         next()
 
-    } catch (e) {
+    } catch {
         next({
             status: 401,
-            message: 'invalid jwt'
+            message: 'invalid session',
         })
     }
 }

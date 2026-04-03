@@ -173,10 +173,9 @@ export default function SocketDispatcher(props: PropsWithChildren) {
     useEffect(() => {
         (async () => {
             if (!userId) return;
-            const jwt = authContext?.jwt ?? "";
-            const messagesService = new MessagesService(jwt, clientId);
-            const followingService = new FollowingService(jwt, clientId);
-            const followersService = new FollowersService(jwt, clientId);
+            const messagesService = new MessagesService("", clientId);
+            const followingService = new FollowingService("", clientId);
+            const followersService = new FollowersService("", clientId);
 
             try {
                 const conversations = await messagesService.getConversations();
@@ -196,7 +195,7 @@ export default function SocketDispatcher(props: PropsWithChildren) {
                 dispatch(initFollowing([]));
             }
         })();
-    }, [dispatch, userId, clientId, authContext?.jwt]);
+    }, [dispatch, userId, clientId, authContext?.user?.id]);
 
     const { children } = props;
 

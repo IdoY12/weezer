@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState, useMemo } from "react";
 import AuthContext from "../components/auth/auth/AuthContext";
-import { jwtDecode } from "jwt-decode";
 import type User from "../models/user";
 import useService from "./use-service";
 import ProfilePictureService from "../services/auth-aware/ProfilePictureService";
@@ -13,53 +12,25 @@ export default function useCurrentUser() {
     const [isLoading, setIsLoading] = useState(true);
     const userId = useUserId();
     
-    // Get basic user info from JWT first (synchronous)
-    const jwtUser = useMemo(() => {
-        if (!authContext?.jwt) return null;
-        try {
-            return jwtDecode<User>(authContext.jwt);
-        } catch {
-            return null;
-        }
-    }, [authContext?.jwt]);
+    const contextUser = useMemo(() => authContext?.user ?? null, [authContext?.user]);
 
     const profilePictureService = useService(ProfilePictureService);
 
-    // Monitor Redux state for profile picture updates for the current user
-    // Check profile slice first (user's own posts), then feed, then followers/following
+    // Sync profile picture from profile Redux when it was updated there (e.g. after upload on profile).
+    // Following/followers lists never include the current user; feed may omit own posts — so we only read profile slice.
     const profilePosts = useAppSelector(state => state.profileSlice.posts);
-    const feedPosts = useAppSelector(state => state.feedSlice.posts);
-    const following = useAppSelector(state => state.followingSlice.following);
-    const followers = useAppSelector(state => state.followersSlice.followers);
 
-    // Find current user's profile picture in Redux state (check all slices)
     const currentUserProfilePicture = useMemo(() => {
         if (!userId) return null;
-        // Check profile posts first (most likely to exist)
         const profilePost = profilePosts.find(p => p.user.id === userId);
         if (profilePost?.user.profilePicture !== undefined) {
             return profilePost.user.profilePicture;
         }
-        // Check feed posts
-        const feedPost = feedPosts.find(p => p.user.id === userId);
-        if (feedPost?.user.profilePicture !== undefined) {
-            return feedPost.user.profilePicture;
-        }
-        // Check following
-        const followingUser = following.find(u => u.id === userId);
-        if (followingUser?.profilePicture !== undefined) {
-            return followingUser.profilePicture;
-        }
-        // Check followers
-        const follower = followers.find(u => u.id === userId);
-        if (follower?.profilePicture !== undefined) {
-            return follower.profilePicture;
-        }
         return null;
-    }, [userId, profilePosts, feedPosts, following, followers]);
+    }, [userId, profilePosts]);
 
     useEffect(() => {
-        if (!authContext?.jwt || !jwtUser) {
+        if (!contextUser) {
             setUser(null);
             setIsLoading(false);
             return;
@@ -72,14 +43,14 @@ export default function useCurrentUser() {
                 const fullUser = await profilePictureService.getCurrentUser();
                 setUser(fullUser);
             } catch {
-                // Fallback to JWT data if API call fails
-                setUser(jwtUser);
+                // Fallback to session user if API call fails
+                setUser(contextUser);
             } finally {
                 setIsLoading(false);
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [authContext?.jwt]);
+    }, [authContext?.user?.id]);
 
     // Update user profile picture if it changed in Redux state
     useEffect(() => {
@@ -93,5 +64,5 @@ export default function useCurrentUser() {
         }
     }, [currentUserProfilePicture]);
 
-    return { user: user || jwtUser, isLoading };
+    return { user: user || contextUser, isLoading };
 }

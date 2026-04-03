@@ -1,11 +1,11 @@
 import { createContext } from "react";
+import type User from "../../../models/user";
 
 interface AuthContextInterface {
-    jwt: string,
-    isPay: boolean,
-    newJwt(jwt: string): void
+    user: User | null;
+    isPay: boolean;
+    setUser(user: User | null): void;
 }
 
 const AuthContext = createContext<AuthContextInterface | null>(null);
 export default AuthContext;
-

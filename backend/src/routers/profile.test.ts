@@ -6,7 +6,7 @@ import config from "config"
 
 describe('profile routers tests', () => {
     describe('GET / tests', () => {
-        test('returns 401 if no auth header', async () => {
+        test('returns 401 if no auth cookie', async () => {
             await start()
             const result = await request(app).get('/profile')
             // console.log(result)  -->  statusCode: 401,
@@ -21,9 +21,7 @@ describe('profile routers tests', () => {
             await start()
             const result = await request(app)
             .get('/profile')
-            .set({                        // <-- this is how i add headers in supertest
-                authorization: `Bearer ${jwt}`
-            })
+            .set('Cookie', [`jwt=${jwt}`])
             expect(result.statusCode).toBe(200)
             expect(Array.isArray(result.body)).toBeTruthy()
             expect(result.body[0]).toHaveProperty('id')

@@ -47,13 +47,12 @@ export default function Signup() {
                 username: signupData.username,
                 password: signupData.password
             };
-            const { jwt } = await authService.signup(signupPayload);
+            await authService.signup(signupPayload);
 
-            // Keep JWT local until all setup steps complete.
             // 1) Optional profile picture upload
             if (profilePictureFile) {
                 try {
-                    const profilePictureService = new ProfilePictureService(jwt, 'signup');
+                    const profilePictureService = new ProfilePictureService('', 'signup');
                     await profilePictureService.uploadProfilePicture(profilePictureFile);
                 } catch (e) {
                     // Silently fail - profile picture upload is optional
@@ -62,11 +61,11 @@ export default function Signup() {
             }
 
             // 2) Fetch final user snapshot so first logged-in render is consistent.
-            const profilePictureService = new ProfilePictureService(jwt, 'signup');
-            await profilePictureService.getCurrentUser();
+            const profilePictureService = new ProfilePictureService('', 'signup');
+            const fullUser = await profilePictureService.getCurrentUser();
 
             // 3) Commit auth state only after setup is complete.
-            authContext?.newJwt(jwt);
+            authContext?.setUser(fullUser);
         } catch (e: unknown) {
             setError("root", { message: extractErrorMessage(e) });
         } finally {

@@ -3,7 +3,8 @@
     "dbType": "DB_TYPE",
     "app": {
         "secret": "APP_SECRET",
-        "jwtSecret": "JWT_SECRET"
+        "jwtSecret": "JWT_SECRET",
+        "clientOrigin": "CLIENT_ORIGIN"
     },
     "db": {
         "host": "DB_HOST"

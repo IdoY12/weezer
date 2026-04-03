@@ -11,7 +11,7 @@ import AuthContext from '../../auth/auth/AuthContext';
 export default function Layout() {
 
     const authContext = useContext(AuthContext);
-    const isLoggedIn = !!authContext?.jwt;
+    const isLoggedIn = !!authContext?.user;
     const location = useLocation();
 
     return (

@@ -1,4 +1,7 @@
 import express, { json } from 'express'
+import cookieParser from 'cookie-parser'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
 import logger from './middlewares/error/logger';
 import responder from './middlewares/error/responder';
 import notFound from './middlewares/not-found';
@@ -14,10 +17,12 @@ import messagesRouter from './routers/messages'
 import config from 'config'
 import sequelize from './db/sequelize';
 import enforceAuth from './middlewares/enforce-auth';
+import enforcePay from './middlewares/enforce-pay';
 import cors from 'cors'
 import { createAppBucketIfNotExists, testUpload } from './aws/aws';
 import fileUpload from 'express-fileupload';
 import { webhook } from './controllers/stripe/controller';
+import csrfProtect from './middlewares/csrf';
 
 const app = express()
 
@@ -25,7 +30,19 @@ const secret = config.get<string>('app.secret')
 
 console.log(`app secret is ${secret}`)
 
-app.use(cors())
+app.use(cors({
+    origin: config.get<string>('app.clientOrigin'),
+    credentials: true,
+}))
+
+app.use(helmet())
+app.use(cookieParser())
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: { message: 'Too many requests, please try again later.' },
+})
 
 // webhooks middlewares
 app.post('/stripe/webhook',
@@ -36,9 +53,11 @@ app.post('/stripe/webhook',
 // post decypher middlewares
 app.use(json())
 app.use(fileUpload())
+// CSRF protection: mutating requests must carry x-csrf-token matching the csrf cookie (see middlewares/csrf.ts).
+app.use(csrfProtect)
 
 // load routers
-app.use('/auth', authRouter)
+app.use('/auth', authLimiter, authRouter)
 app.use(enforceAuth)
 app.use('/users', usersRouter)
 app.use('/profile', profileRouter)
@@ -46,7 +65,7 @@ app.use('/feed', feedRouter)
 app.use('/follows', followsRouter)
 app.use('/comments', commentsRouter)
 app.use('/stripe', stripeRouter)
-app.use('/openai', openaiRouter)
+app.use('/openai', enforcePay, openaiRouter)
 app.use('/messages', messagesRouter)
 
 // not found

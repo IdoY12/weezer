@@ -1,19 +1,23 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import './Header.css';
 import { useContext } from 'react';
 import AuthContext from '../../auth/auth/AuthContext';
 import useCurrentUser from '../../../hooks/use-current-user';
 import ProfilePicture from '../../common/profile-picture/ProfilePicture';
 import { useAppSelector } from '../../../redux/hooks';
+import authService from '../../../services/auth';
 
 export default function Header() {
     const authContext = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const { user } = useCurrentUser();
     const unreadMessages = useAppSelector(state => state.messagesSlice.unreadCount);
 
-    function logout() {
-        authContext?.newJwt('');
+    async function logout() {
+        await authService.logout();
+        authContext?.setUser(null);
+        navigate('/login');
     }
 
     return (
@@ -90,7 +94,7 @@ export default function Header() {
                     <span className="user-greeting">Welcome back</span>
                     <span className="user-name">{user?.name || 'User'}</span>
                 </div>
-                <button onClick={logout} className="logout-btn" title="Sign out">
+                <button onClick={() => void logout()} className="logout-btn" title="Sign out">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                         <polyline points="16,17 21,12 16,7" />
